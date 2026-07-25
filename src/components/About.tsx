@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Flame, ShieldCheck, Infinity as InfinityIcon, Rocket, Sparkles } from 'lucide-react';
 import { useReveal } from '@/hooks/useReveal';
 import { useTilt } from '@/hooks/useTilt';
@@ -15,19 +15,32 @@ const FEATURES = [
 export function About() {
   const { ref, visible } = useReveal();
   const heroRef = useRef<HTMLDivElement>(null);
-  const [parallax, setParallax] = useState(0);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
+    let ticking = false;
     const onScroll = () => {
-      const el = heroRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const center = window.innerHeight / 2;
-      setParallax((rect.top + rect.height / 2 - center) * -0.08);
+      if (ticking) return;
+      ticking = true;
+      rafRef.current = requestAnimationFrame(() => {
+        const el = heroRef.current;
+        const img = imgRef.current;
+        if (el && img) {
+          const rect = el.getBoundingClientRect();
+          const center = window.innerHeight / 2;
+          const parallax = (rect.top + rect.height / 2 - center) * -0.08;
+          img.style.transform = `translateY(${parallax}px)`;
+        }
+        ticking = false;
+      });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
   return (
@@ -39,12 +52,30 @@ export function About() {
         {/* Floating pepe + headline */}
         <div ref={heroRef} className="flex flex-col items-center text-center mb-20">
           <div className="relative mb-8">
-            <div className="absolute inset-0 animate-spin-slower rounded-full" style={{ background: 'conic-gradient(from 0deg, transparent, rgba(74,222,128,0.3), transparent)' }} />
+            {/* Outer glow ring — enlarged to fully wrap the image */}
+            <div
+              className="absolute rounded-full animate-spin-slower"
+              style={{
+                inset: '-28px',
+                background: 'conic-gradient(from 0deg, transparent, rgba(74,222,128,0.35), transparent)',
+              }}
+            />
+            {/* Static green circle that sits behind the image */}
+            <div
+              className="absolute rounded-full"
+              style={{
+                inset: '-18px',
+                background: 'radial-gradient(circle, rgba(74,222,128,0.18) 60%, transparent 100%)',
+                boxShadow: '0 0 60px 20px rgba(74,222,128,0.15)',
+              }}
+            />
             <img
+              ref={imgRef}
               src={PEPE_IMG}
               alt="Pepe"
+              loading="lazy"
               className="relative w-44 h-44 md:w-56 md:h-56 object-contain animate-float drop-shadow-[0_0_40px_rgba(74,222,128,0.5)]"
-              style={{ transform: `translateY(${parallax}px)`, mixBlendMode: 'screen' }}
+              style={{ mixBlendMode: 'screen' }}
             />
           </div>
           <span className="text-green-400 text-sm font-bold tracking-[0.3em] uppercase flex items-center gap-2">

@@ -7,49 +7,66 @@ const CONTRACT = '0x6982508145454ce325ddbe47a25d4ec3d2311933';
 
 export function Hero() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const gridPatternRef = useRef<SVGPatternElement>(null);
+  const revealRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const smoothRef = useRef({ x: 0, y: 0 });
   const gridOffsetRef = useRef({ x: 0, y: 0 });
   const rafRef = useRef<number>(0);
+  const tickingRef = useRef(false);
 
-  const [gridOffset, setGridOffset] = useState({ x: 0, y: 0 });
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    // Init smooth/cursor to center
-    smoothRef.current = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    mouseRef.current  = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    setCursorPos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    smoothRef.current = { x: w / 2, y: h / 2 };
+    mouseRef.current = { x: w / 2, y: h / 2 };
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
+      if (!tickingRef.current) {
+        tickingRef.current = true;
+        rafRef.current = requestAnimationFrame(loop);
+      }
     };
 
     const loop = () => {
       const section = sectionRef.current;
-      if (!section) { rafRef.current = requestAnimationFrame(loop); return; }
+      if (!section) { tickingRef.current = false; return; }
 
       const rect = section.getBoundingClientRect();
 
       smoothRef.current.x += (mouseRef.current.x - smoothRef.current.x) * 0.1;
       smoothRef.current.y += (mouseRef.current.y - smoothRef.current.y) * 0.1;
 
-      const cx = (smoothRef.current.x - rect.left) / rect.width  - 0.5;
-      const cy = (smoothRef.current.y - rect.top)  / rect.height - 0.5;
+      const cx = (smoothRef.current.x - rect.left) / rect.width - 0.5;
+      const cy = (smoothRef.current.y - rect.top) / rect.height - 0.5;
 
       gridOffsetRef.current.x += (cx * 16 - gridOffsetRef.current.x) * 0.06;
       gridOffsetRef.current.y += (cy * 16 - gridOffsetRef.current.y) * 0.06;
 
-      setGridOffset({ x: gridOffsetRef.current.x, y: gridOffsetRef.current.y });
-      setCursorPos({ x: smoothRef.current.x, y: smoothRef.current.y });
+      // Imperative DOM updates — no React re-render per frame
+      if (gridPatternRef.current) {
+        gridPatternRef.current.setAttribute('x', String(gridOffsetRef.current.x));
+        gridPatternRef.current.setAttribute('y', String(gridOffsetRef.current.y));
+      }
+      if (revealRef.current) {
+        revealRef.current.style.setProperty('--spot-x', `${smoothRef.current.x}px`);
+        revealRef.current.style.setProperty('--spot-y', `${smoothRef.current.y}px`);
+      }
 
-      rafRef.current = requestAnimationFrame(loop);
+      // Continue the loop while values are still settling
+      const dx = Math.abs(mouseRef.current.x - smoothRef.current.x);
+      const dy = Math.abs(mouseRef.current.y - smoothRef.current.y);
+      if (dx > 0.5 || dy > 0.5) {
+        rafRef.current = requestAnimationFrame(loop);
+      } else {
+        tickingRef.current = false;
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    rafRef.current = requestAnimationFrame(loop);
-
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(rafRef.current);
@@ -87,12 +104,11 @@ export function Hero() {
       >
         <defs>
           <pattern
+            ref={gridPatternRef}
             id="grid"
             width="48"
             height="48"
             patternUnits="userSpaceOnUse"
-            x={gridOffset.x}
-            y={gridOffset.y}
           >
             <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#64748b" strokeWidth="0.6" />
           </pattern>
@@ -100,8 +116,10 @@ export function Hero() {
         <rect width="100%" height="100%" fill="url(#grid)" />
       </svg>
 
-      {/* Spotlight reveal layer */}
-      <RevealLayer cursorX={cursorPos.x} cursorY={cursorPos.y} />
+      {/* Spotlight reveal layer (imperative, no re-renders) */}
+      <div ref={revealRef}>
+        <RevealLayer cursorX={0} cursorY={0} />
+      </div>
 
       {/* Dark overlay for text readability */}
       <div

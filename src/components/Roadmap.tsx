@@ -31,22 +31,16 @@ export function Roadmap() {
       ref={ref}
       className={`relative py-32 overflow-hidden section-reveal ${visible ? 'is-visible' : ''}`}
       style={{
-        background: 'linear-gradient(180deg, #000 0%, #030f07 40%, #000 100%)',
+        backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.72) 40%, rgba(0,0,0,0.88) 100%), url(https://ik.imagekit.io/zznoau6lx/ee5bb410-87fb-426d-acaa-f7fc13ed80b7.png)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'scroll',
+        backgroundRepeat: 'no-repeat',
       }}
     >
       {/* Ambient green orbs */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-green-500/8 rounded-full blur-[160px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-green-600/6 rounded-full blur-[140px] pointer-events-none" />
-
-      {/* Subtle grid */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(74,222,128,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(74,222,128,0.04) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-        }}
-      />
 
       {/* Top + bottom fade */}
       <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black to-transparent pointer-events-none" />

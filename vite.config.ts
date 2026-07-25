@@ -10,7 +10,18 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  optimizeDeps: {
-    exclude: ['lucide-react'],
+  build: {
+    // Split vendor chunks for better caching and parallel loading.
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'icons': ['lucide-react'],
+        },
+      },
+    },
+    // Target modern browsers — smaller, faster output.
+    target: 'es2020',
+    cssMinify: 'esbuild',
   },
 });
