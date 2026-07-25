@@ -116,10 +116,8 @@ export function Hero() {
         <rect width="100%" height="100%" fill="url(#grid)" />
       </svg>
 
-      {/* Spotlight reveal layer (imperative, no re-renders) */}
-      <div ref={revealRef}>
-        <RevealLayer cursorX={0} cursorY={0} />
-      </div>
+      {/* Spotlight reveal layer — ref driven imperatively by the rAF loop */}
+      <RevealLayer ref={revealRef} />
 
       {/* Dark overlay for text readability */}
       <div
