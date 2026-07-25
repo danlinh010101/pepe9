@@ -9,7 +9,7 @@ const SOCIALS = [
   { icon: Globe,         label: 'Website',       href: '#', handle: 'pepe.lol',   stat: '24/7' },
 ];
 
-const PEPE_IMG = 'https://ik.imagekit.io/zznoau6lx/bee56bec-991e-4e14-9f93-dbd941924657.png';
+const PEPE_IMG = 'https://ik.imagekit.io/zznoau6lx/4efe7296-c637-47af-92da-4be859f4bb17.png';
 
 export function Community() {
   const { ref, visible } = useReveal();
