@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-const PEPE_CURSOR = 'https://ik.imagekit.io/zznoau6lx/bee56bec-991e-4e14-9f93-dbd941924657.png';
+const PEPE_CURSOR = 'https://ik.imagekit.io/zznoau6lx/ab6607fb-6001-461c-97d7-ae4f1011db73.png';
 
 export function CursorGlow() {
   const outerRef = useRef<HTMLDivElement>(null);
