@@ -1,13 +1,19 @@
 import { useRef } from 'react';
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { useReveal } from '@/hooks/useReveal';
 
 const PHASES = [
-  { phase: '01', title: 'The Awakening',   status: 'done',     items: ['Stealth launch on Ethereum', 'Initial liquidity locked', 'First 10,000 holders', 'CoinGecko & CMC listing'] },
-  { phase: '02', title: 'The Takeoff',      status: 'done',     items: ['100,000 holders milestone', 'Tier-1 CEX listings', 'First Pepe meme contest', 'Treasury established'] },
-  { phase: '03', title: 'The Expansion',    status: 'active',   items: ['Pepe NFT collection', 'Cross-chain bridge', 'Developer grants program', 'Major brand collabs'] },
-  { phase: '04', title: 'The Forever War',  status: 'upcoming',  items: ['Pepe DAO launch', 'Gaming ecosystem', 'Global Pepe convention', '1M+ holders'] },
+  { phase: '01', title: 'The Awakening',  status: 'done',     items: ['Stealth launch on Ethereum', 'Initial liquidity locked', 'First 10,000 holders', 'CoinGecko & CMC listing'] },
+  { phase: '02', title: 'The Takeoff',    status: 'done',     items: ['100,000 holders milestone', 'Tier-1 CEX listings', 'First Pepe meme contest', 'Treasury established'] },
+  { phase: '03', title: 'The Expansion',  status: 'active',   items: ['Pepe NFT collection', 'Cross-chain bridge', 'Developer grants program', 'Major brand collabs'] },
+  { phase: '04', title: 'The Forever War',status: 'upcoming', items: ['Pepe DAO launch', 'Gaming ecosystem', 'Global Pepe convention', '1M+ holders'] },
 ];
+
+const STATUS_META = {
+  done:     { label: 'Complete',    badge: 'bg-green-500/20 text-green-400 border border-green-500/30' },
+  active:   { label: 'In Progress', badge: 'bg-green-400 text-black border border-green-300 animate-pulse' },
+  upcoming: { label: 'Upcoming',    badge: 'bg-white/5 text-gray-500 border border-white/10' },
+} as const;
 
 export function Roadmap() {
   const { ref, visible } = useReveal();
@@ -20,29 +26,53 @@ export function Roadmap() {
   };
 
   return (
-    <section id="roadmap" ref={ref} className={`relative py-32 overflow-hidden section-reveal ${visible ? 'is-visible' : ''}`}>
-      {/* Background image */}
+    <section
+      id="roadmap"
+      ref={ref}
+      className={`relative py-32 overflow-hidden section-reveal ${visible ? 'is-visible' : ''}`}
+      style={{
+        background: 'linear-gradient(180deg, #000 0%, #030f07 40%, #000 100%)',
+      }}
+    >
+      {/* Ambient green orbs */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-green-500/8 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-green-600/6 rounded-full blur-[140px] pointer-events-none" />
+
+      {/* Subtle grid */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(https://ik.imagekit.io/zznoau6lx/7fcf6e7d-32fe-4db9-b32f-ac0eb2b6b703.png)' }}
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(74,222,128,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(74,222,128,0.04) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }}
       />
-      <div className="absolute inset-0 bg-black/75" />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
-      <div className="absolute top-0 left-1/3 w-96 h-96 bg-green-500/10 rounded-full blur-[140px] pointer-events-none" />
+
+      {/* Top + bottom fade */}
+      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black to-transparent pointer-events-none" />
 
       <div className="relative max-w-6xl mx-auto px-6">
         <div className={`flex items-end justify-between mb-16 reveal ${visible ? 'is-visible' : ''}`}>
           <div>
-            <span className="text-green-400 text-sm font-bold tracking-[0.3em] uppercase">Roadmap</span>
+            <span className="inline-flex items-center gap-2 text-green-400 text-sm font-bold tracking-[0.3em] uppercase">
+              <Sparkles className="w-4 h-4" /> Roadmap
+            </span>
             <h2 className="text-5xl md:text-8xl font-black text-white mt-4 tracking-tighter leading-none">
               PATH TO <span className="text-glow-green text-green-400">VALHALLA</span>
             </h2>
           </div>
           <div className="hidden md:flex gap-2">
-            <button onClick={() => scroll(-1)} className="w-12 h-12 rounded-full border border-white/10 hover:border-green-500/50 hover:bg-green-500/10 flex items-center justify-center text-gray-400 hover:text-green-400 transition-all">
+            <button
+              onClick={() => scroll(-1)}
+              className="w-12 h-12 rounded-full border border-white/10 hover:border-green-500/50 hover:bg-green-500/10 flex items-center justify-center text-gray-400 hover:text-green-400 transition-all duration-200"
+            >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button onClick={() => scroll(1)} className="w-12 h-12 rounded-full border border-white/10 hover:border-green-500/50 hover:bg-green-500/10 flex items-center justify-center text-gray-400 hover:text-green-400 transition-all">
+            <button
+              onClick={() => scroll(1)}
+              className="w-12 h-12 rounded-full border border-white/10 hover:border-green-500/50 hover:bg-green-500/10 flex items-center justify-center text-gray-400 hover:text-green-400 transition-all duration-200"
+            >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -52,39 +82,104 @@ export function Roadmap() {
       {/* Horizontal scroll */}
       <div
         ref={scrollRef}
-        className="relative flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-6 max-w-6xl mx-auto pb-4"
+        className="relative flex gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-6 max-w-6xl mx-auto pb-4"
       >
-        {PHASES.map((p, i) => (
-          <div
-            key={p.phase}
-            className={`flex-shrink-0 w-[340px] md:w-[380px] snap-center p-8 rounded-3xl border transition-all duration-500 reveal-scale ${visible ? 'is-visible' : ''} ${
-              p.status === 'active' ? 'border-green-500/50 bg-green-500/[0.06]' : 'border-white/10 bg-white/[0.02]'
-            } hover:border-green-500/40 hover:-translate-y-2`}
-            style={{ transitionDelay: `${i * 120}ms` }}
-          >
-            <div className="flex items-center justify-between mb-6">
-              <span className="text-6xl font-black text-green-500/10">{p.phase}</span>
-              <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                p.status === 'done' ? 'bg-green-500/20 text-green-400' :
-                p.status === 'active' ? 'bg-green-400 text-black animate-pulse' :
-                'bg-gray-800 text-gray-500'
-              }`}>
-                {p.status === 'done' ? 'Complete' : p.status === 'active' ? 'In Progress' : 'Upcoming'}
-              </span>
-            </div>
-            <h3 className="text-2xl font-black text-white mb-5">{p.title}</h3>
-            <ul className="space-y-3">
-              {p.items.map((item) => (
-                <li key={item} className="flex items-center gap-2.5 text-gray-400 text-sm">
-                  <span className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${p.status === 'done' ? 'bg-green-500/20' : 'bg-white/5'}`}>
-                    <Check className={`w-3 h-3 ${p.status === 'done' ? 'text-green-400' : 'text-gray-600'}`} />
+        {PHASES.map((p, i) => {
+          const meta = STATUS_META[p.status as keyof typeof STATUS_META];
+          const isActive = p.status === 'active';
+          const isDone = p.status === 'done';
+
+          return (
+            <div
+              key={p.phase}
+              className={`flex-shrink-0 w-[320px] md:w-[360px] snap-center reveal-scale ${visible ? 'is-visible' : ''}`}
+              style={{ transitionDelay: `${i * 120}ms` }}
+            >
+              {/* Card */}
+              <div
+                className={`relative h-full rounded-3xl p-7 flex flex-col overflow-hidden transition-all duration-500 hover:-translate-y-2 group ${
+                  isActive
+                    ? 'border border-green-400/50 shadow-xl shadow-green-500/20'
+                    : isDone
+                    ? 'border border-green-500/25 shadow-lg shadow-green-500/5'
+                    : 'border border-white/8'
+                }`}
+                style={{
+                  background: isActive
+                    ? 'linear-gradient(145deg, rgba(74,222,128,0.10) 0%, rgba(22,163,74,0.06) 50%, rgba(0,0,0,0.85) 100%)'
+                    : isDone
+                    ? 'linear-gradient(145deg, rgba(74,222,128,0.05) 0%, rgba(0,0,0,0.80) 100%)'
+                    : 'linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.75) 100%)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                }}
+              >
+                {/* Active glow ring */}
+                {isActive && (
+                  <div className="absolute inset-0 rounded-3xl pointer-events-none" style={{ boxShadow: 'inset 0 0 60px rgba(74,222,128,0.08)' }} />
+                )}
+
+                {/* Aurora sweep on hover */}
+                <div className="absolute inset-0 rounded-3xl aurora opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                {/* Header row */}
+                <div className="flex items-center justify-between mb-6">
+                  <span
+                    className="text-7xl font-black leading-none select-none"
+                    style={{
+                      color: isActive ? 'rgba(74,222,128,0.18)' : 'rgba(255,255,255,0.06)',
+                    }}
+                  >
+                    {p.phase}
                   </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${meta.badge}`}>
+                    {meta.label}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h3 className={`text-2xl font-black mb-5 leading-tight ${isActive ? 'text-white' : isDone ? 'text-gray-200' : 'text-gray-400'}`}>
+                  {p.title}
+                </h3>
+
+                {/* Items */}
+                <ul className="space-y-2.5 flex-1">
+                  {p.items.map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-sm">
+                      <span
+                        className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          isDone
+                            ? 'bg-green-500/25 border border-green-500/30'
+                            : isActive
+                            ? 'bg-green-500/15 border border-green-500/30'
+                            : 'bg-white/5 border border-white/10'
+                        }`}
+                      >
+                        <Check className={`w-3 h-3 ${isDone || isActive ? 'text-green-400' : 'text-gray-600'}`} />
+                      </span>
+                      <span className={isDone ? 'text-gray-300' : isActive ? 'text-gray-300' : 'text-gray-500'}>
+                        {item}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Bottom phase indicator line */}
+                <div className="mt-6 h-0.5 rounded-full overflow-hidden bg-white/5">
+                  <div
+                    className="h-full rounded-full transition-all duration-1000"
+                    style={{
+                      width: isDone ? '100%' : isActive ? '55%' : '0%',
+                      background: isDone
+                        ? 'linear-gradient(90deg, #16a34a, #4ade80)'
+                        : 'linear-gradient(90deg, #4ade80, #86efac)',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
