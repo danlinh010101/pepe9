@@ -115,13 +115,13 @@ export function Hero() {
           <span className="text-2xl font-black tracking-tight text-green-400" style={{ fontFamily: 'monospace' }}>$PEPE</span>
         </div>
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300">
-          <a href="#" className="hover:text-green-400 transition-colors">About</a>
-          <a href="#" className="hover:text-green-400 transition-colors">Tokenomics</a>
-          <a href="#" className="hover:text-green-400 transition-colors">Roadmap</a>
-          <a href="#" className="hover:text-green-400 transition-colors">Community</a>
+          <a href="#about" className="hover:text-green-400 transition-colors">About</a>
+          <a href="#tokenomics" className="hover:text-green-400 transition-colors">Tokenomics</a>
+          <a href="#roadmap" className="hover:text-green-400 transition-colors">Roadmap</a>
+          <a href="#community" className="hover:text-green-400 transition-colors">Community</a>
         </div>
         <a
-          href="#"
+          href="#how-to-buy"
           className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-black bg-green-400 hover:bg-green-300 transition-all duration-200 hover:scale-105"
         >
           Buy $PEPE
@@ -164,14 +164,14 @@ export function Hero() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
           <a
-            href="#"
+            href="#how-to-buy"
             className="group relative inline-flex items-center gap-2.5 px-8 py-4 rounded-full font-black text-black bg-green-400 hover:bg-green-300 text-lg transition-all duration-200 hover:scale-105 shadow-lg shadow-green-500/25"
           >
             <TrendingUp className="w-5 h-5" />
             Buy on Uniswap
           </a>
           <a
-            href="#"
+            href="#how-to-buy"
             className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full font-bold text-green-400 border border-green-500/50 bg-white/5 backdrop-blur-sm hover:bg-green-500/10 text-lg transition-all duration-200 hover:scale-105"
           >
             <Zap className="w-5 h-5" />
