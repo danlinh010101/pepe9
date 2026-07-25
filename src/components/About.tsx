@@ -3,7 +3,7 @@ import { Flame, ShieldCheck, Infinity as InfinityIcon, Rocket, Sparkles } from '
 import { useReveal } from '@/hooks/useReveal';
 import { useTilt } from '@/hooks/useTilt';
 
-const PEPE_IMG = 'https://ik.imagekit.io/zznoau6lx/30b9b4f1-d012-419c-aac7-e6ddd2c5d09d.png';
+const PEPE_IMG = 'https://ik.imagekit.io/zznoau6lx/327fc132-f7cb-4027-a2fe-9b5f5ff42f9e.png';
 
 const FEATURES = [
   { icon: Flame,         title: 'Pure Memetic Energy', body: 'Born from the dankest corners of the internet. Pepe powers the most relentless community in crypto.', span: 'md:col-span-2' },
