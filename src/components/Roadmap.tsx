@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { useReveal } from '@/hooks/useReveal';
 
@@ -18,6 +18,45 @@ const STATUS_META = {
 export function Roadmap() {
   const { ref, visible } = useReveal();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const scrollTo = (index: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cards = el.querySelectorAll<HTMLElement>(':scope > div');
+    if (cards[index]) {
+      cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      setActiveIndex(index);
+    }
+  };
+
+  // Track which card is centered when the user swipes manually
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const cards = el.querySelectorAll<HTMLElement>(':scope > div');
+        if (cards.length === 0) { ticking = false; return; }
+        const elCenter = el.scrollLeft + el.clientWidth / 2;
+        let best = 0;
+        let bestDist = Infinity;
+        cards.forEach((card, i) => {
+          const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+          const dist = Math.abs(cardCenter - elCenter);
+          if (dist < bestDist) { bestDist = dist; best = i; }
+        });
+        setActiveIndex(best);
+        ticking = false;
+      });
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
 
   const scroll = (dir: number) => {
     const el = scrollRef.current;
@@ -174,6 +213,38 @@ export function Roadmap() {
             </div>
           );
         })}
+      </div>
+
+      {/* Mobile prev/next buttons — outside the scroll container */}
+      <div className="flex md:hidden items-center justify-between mt-8 px-6 max-w-6xl mx-auto">
+        <button
+          onClick={() => scrollTo(Math.max(0, activeIndex - 1))}
+          disabled={activeIndex === 0}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/15 bg-black/50 backdrop-blur-sm text-gray-300 text-sm font-semibold disabled:opacity-30 active:scale-95 transition-all duration-150"
+        >
+          <ChevronLeft className="w-4 h-4" /> Prev
+        </button>
+
+        {/* Dot indicators */}
+        <div className="flex items-center gap-2">
+          {PHASES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => scrollTo(i)}
+              className={`rounded-full transition-all duration-300 ${
+                i === activeIndex ? 'w-6 h-2.5 bg-green-400' : 'w-2.5 h-2.5 bg-white/20'
+              }`}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={() => scrollTo(Math.min(PHASES.length - 1, activeIndex + 1))}
+          disabled={activeIndex === PHASES.length - 1}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/15 bg-black/50 backdrop-blur-sm text-gray-300 text-sm font-semibold disabled:opacity-30 active:scale-95 transition-all duration-150"
+        >
+          Next <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
     </section>
   );

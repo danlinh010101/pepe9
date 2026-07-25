@@ -86,7 +86,7 @@ export function Hero() {
       style={{
         backgroundImage: `url(${BG_IMAGE_1})`,
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundPosition: 'center 30%',
         backgroundRepeat: 'no-repeat',
       }}
     >
@@ -138,14 +138,14 @@ export function Hero() {
         </div>
         <a
           href="#how-to-buy"
-          className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-black bg-green-400 hover:bg-green-300 transition-all duration-200 hover:scale-105"
+          className="inline-flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-bold text-black bg-green-400 hover:bg-green-300 transition-all duration-200 hover:scale-105"
         >
           Buy $PEPE
         </a>
       </nav>
 
       {/* Hero content */}
-      <div className="relative z-20 flex-1 flex flex-col items-center justify-center text-center px-6 pb-24 pt-8">
+      <div className="relative z-20 flex-1 flex flex-col items-center justify-center text-center px-6 pb-20 pt-4 sm:pb-24 sm:pt-8">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full border border-green-500/40 bg-green-500/10 backdrop-blur-sm">
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -154,7 +154,7 @@ export function Hero() {
 
         {/* Title */}
         <h1
-          className="text-8xl md:text-[10rem] lg:text-[13rem] font-black leading-none tracking-tighter text-white mb-2 select-none"
+          className="text-6xl sm:text-8xl md:text-[10rem] lg:text-[13rem] font-black leading-none tracking-tighter text-white mb-2 select-none"
           style={{
             textShadow: '0 0 80px rgba(74,222,128,0.4), 0 0 160px rgba(74,222,128,0.15)',
             fontFamily: '"Impact", "Arial Black", sans-serif',
@@ -166,29 +166,29 @@ export function Hero() {
 
         {/* Subtitle */}
         <p
-          className="text-green-400 text-xl md:text-2xl font-bold mb-4 tracking-widest uppercase"
+          className="text-green-400 text-sm sm:text-xl md:text-2xl font-bold mb-4 tracking-widest uppercase"
           style={{ fontFamily: 'monospace' }}
         >
           The Most Memeable Memecoin
         </p>
 
-        <p className="text-gray-300 text-base md:text-lg max-w-xl mb-10 leading-relaxed">
+        <p className="text-gray-300 text-sm md:text-lg max-w-xl mb-8 leading-relaxed">
           No taxes. No bullshit. Just vibes and green candles.<br />
           Pepe is here to make memecoins great again.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
+        <div className="flex flex-col sm:flex-row items-center gap-3 mb-8">
           <a
             href="#how-to-buy"
-            className="group relative inline-flex items-center gap-2.5 px-8 py-4 rounded-full font-black text-black bg-green-400 hover:bg-green-300 text-lg transition-all duration-200 hover:scale-105 shadow-lg shadow-green-500/25"
+            className="group relative inline-flex items-center gap-2.5 px-6 py-3 sm:px-8 sm:py-4 rounded-full font-black text-black bg-green-400 hover:bg-green-300 text-base sm:text-lg transition-all duration-200 hover:scale-105 shadow-lg shadow-green-500/25"
           >
             <TrendingUp className="w-5 h-5" />
             Buy on Uniswap
           </a>
           <a
             href="#how-to-buy"
-            className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full font-bold text-green-400 border border-green-500/50 bg-white/5 backdrop-blur-sm hover:bg-green-500/10 text-lg transition-all duration-200 hover:scale-105"
+            className="inline-flex items-center gap-2.5 px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold text-green-400 border border-green-500/50 bg-white/5 backdrop-blur-sm hover:bg-green-500/10 text-base sm:text-lg transition-all duration-200 hover:scale-105"
           >
             <Zap className="w-5 h-5" />
             How to Buy
@@ -196,9 +196,9 @@ export function Hero() {
         </div>
 
         {/* Contract address */}
-        <div className="flex items-center gap-3 px-5 py-3 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md mb-14">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md mb-8 max-w-xs sm:max-w-none w-full sm:w-auto">
           <span className="text-gray-500 text-xs font-semibold uppercase tracking-wider hidden sm:block">CA</span>
-          <span className="text-gray-300 text-xs sm:text-sm font-mono truncate max-w-[220px] sm:max-w-none">
+          <span className="text-gray-300 text-xs font-mono truncate flex-1 sm:flex-none sm:max-w-none">
             {CONTRACT}
           </span>
           <button
@@ -213,16 +213,16 @@ export function Hero() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-6 sm:gap-12">
+        <div className="grid grid-cols-3 gap-4 sm:gap-12">
           {[
             { label: 'Market Cap', value: '$1.2B', icon: TrendingUp },
             { label: 'Holders',    value: '300K+', icon: Users },
             { label: 'Total Supply', value: '420.69T', icon: Zap },
           ].map(({ label, value, icon: Icon }) => (
             <div key={label} className="flex flex-col items-center gap-1">
-              <Icon className="w-4 h-4 text-green-500 mb-1" />
-              <span className="text-white text-xl sm:text-2xl font-black">{value}</span>
-              <span className="text-gray-500 text-xs uppercase tracking-wider">{label}</span>
+              <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500 mb-1" />
+              <span className="text-white text-lg sm:text-2xl font-black">{value}</span>
+              <span className="text-gray-500 text-[10px] sm:text-xs uppercase tracking-wider">{label}</span>
             </div>
           ))}
         </div>
