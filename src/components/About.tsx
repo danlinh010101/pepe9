@@ -31,7 +31,7 @@ export function About() {
   }, []);
 
   return (
-    <section id="about" ref={ref} className="relative py-32 px-6 mesh-bg noise overflow-hidden">
+    <section id="about" ref={ref} className={`relative py-32 px-6 mesh-bg noise overflow-hidden section-reveal ${visible ? 'is-visible' : ''}`}>
       <div className="absolute -top-20 -left-20 w-96 h-96 bg-green-500/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 -right-20 w-96 h-96 bg-green-600/10 rounded-full blur-[120px] pointer-events-none" />
 
@@ -44,7 +44,7 @@ export function About() {
               src={PEPE_IMG}
               alt="Pepe"
               className="relative w-44 h-44 md:w-56 md:h-56 object-contain animate-float drop-shadow-[0_0_40px_rgba(74,222,128,0.5)]"
-              style={{ transform: `translateY(${parallax}px)` }}
+              style={{ transform: `translateY(${parallax}px)`, mixBlendMode: 'screen' }}
             />
           </div>
           <span className="text-green-400 text-sm font-bold tracking-[0.3em] uppercase flex items-center gap-2">

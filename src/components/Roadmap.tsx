@@ -20,7 +20,14 @@ export function Roadmap() {
   };
 
   return (
-    <section id="roadmap" ref={ref} className="relative py-32 overflow-hidden">
+    <section id="roadmap" ref={ref} className={`relative py-32 overflow-hidden section-reveal ${visible ? 'is-visible' : ''}`}>
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(https://ik.imagekit.io/zznoau6lx/7fcf6e7d-32fe-4db9-b32f-ac0eb2b6b703.png)' }}
+      />
+      <div className="absolute inset-0 bg-black/75" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
       <div className="absolute top-0 left-1/3 w-96 h-96 bg-green-500/10 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="relative max-w-6xl mx-auto px-6">

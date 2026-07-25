@@ -16,7 +16,7 @@ export function Community() {
   const tilt = useTilt<HTMLDivElement>(16);
 
   return (
-    <section id="community" ref={ref} className="relative py-32 px-6 overflow-hidden mesh-bg noise">
+    <section id="community" ref={ref} className={`relative py-32 px-6 overflow-hidden mesh-bg noise section-reveal ${visible ? 'is-visible' : ''}`}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-green-500/10 rounded-full blur-[160px] pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto text-center">
@@ -24,7 +24,7 @@ export function Community() {
         <div className="flex justify-center mb-8 perspective-1000">
           <div ref={tilt.ref} onMouseMove={tilt.onMove} onMouseLeave={tilt.onLeave} className="tilt-card relative w-40 h-40">
             <div className="absolute inset-0 animate-spin-slow rounded-full" style={{ background: 'conic-gradient(from 0deg, transparent, rgba(74,222,128,0.4), transparent)' }} />
-            <img src={PEPE_IMG} alt="Pepe" className="relative w-full h-full object-contain animate-float drop-shadow-[0_0_40px_rgba(74,222,128,0.6)] tilt-inner" />
+            <img src={PEPE_IMG} alt="Pepe" className="relative w-full h-full object-contain animate-float tilt-inner" style={{ filter: 'drop-shadow(0 0 40px rgba(74,222,128,0.6))', mixBlendMode: 'screen' }} />
           </div>
         </div>
 

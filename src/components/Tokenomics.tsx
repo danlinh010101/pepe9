@@ -59,7 +59,14 @@ export function Tokenomics() {
   let offsetAcc = 0;
 
   return (
-    <section id="tokenomics" ref={ref} className="relative py-32 px-6 overflow-hidden bg-grid-fine">
+    <section id="tokenomics" ref={ref} className={`relative py-32 px-6 overflow-hidden section-reveal ${visible ? 'is-visible' : ''}`}>
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(https://ik.imagekit.io/zznoau6lx/fd38eafe-25f9-4089-8490-8044107a3373.png)' }}
+      />
+      <div className="absolute inset-0 bg-black/70" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-green-500/5 rounded-full blur-[160px] pointer-events-none" />
 
       <div className="relative max-w-6xl mx-auto">
@@ -121,7 +128,7 @@ export function Tokenomics() {
             {SEGMENTS.map((seg, i) => (
               <div
                 key={seg.label}
-                className={`group flex items-center gap-4 p-4 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-green-500/30 hover:translate-x-2 transition-all duration-300 reveal ${visible ? 'is-visible' : ''}`}
+                className={`group flex items-center gap-4 p-4 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm hover:border-green-500/30 hover:translate-x-2 transition-all duration-300 reveal ${visible ? 'is-visible' : ''}`}
                 style={{ transitionDelay: `${i * 80}ms` }}
               >
                 <span className="w-4 h-4 rounded-full flex-shrink-0 group-hover:scale-150 transition-transform" style={{ background: seg.color, boxShadow: `0 0 12px ${seg.color}` }} />
@@ -146,7 +153,7 @@ function StatCard({ stat, active, index }: { stat: typeof STATS[number]; active:
 
   return (
     <div
-      className={`p-6 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] to-transparent hover:border-green-500/40 transition-all duration-300 reveal ${active ? 'is-visible' : ''}`}
+      className={`p-6 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm hover:border-green-500/40 transition-all duration-300 reveal ${active ? 'is-visible' : ''}`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
       <div className="text-3xl md:text-4xl font-black text-white font-mono">

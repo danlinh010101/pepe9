@@ -21,7 +21,7 @@ export function HowToBuy() {
   }, [visible]);
 
   return (
-    <section id="how-to-buy" ref={ref} className="relative py-32 px-6 overflow-hidden mesh-bg noise">
+    <section id="how-to-buy" ref={ref} className={`relative py-32 px-6 overflow-hidden mesh-bg noise section-reveal ${visible ? 'is-visible' : ''}`}>
       <div className="absolute -top-10 right-1/4 w-80 h-80 bg-green-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative max-w-6xl mx-auto">

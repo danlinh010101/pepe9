@@ -24,7 +24,7 @@ export function MemeGallery() {
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
-    <section id="gallery" ref={ref} className="relative py-32 px-6 overflow-hidden bg-grid-fine noise">
+    <section id="gallery" ref={ref} className={`relative py-32 px-6 overflow-hidden bg-grid-fine noise section-reveal ${visible ? 'is-visible' : ''}`}>
       <div className="absolute -bottom-10 left-1/4 w-80 h-80 bg-green-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative max-w-6xl mx-auto">
@@ -88,6 +88,7 @@ function GalleryCard({
         alt={meme.title}
         loading="lazy"
         className="relative w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        style={{ mixBlendMode: 'screen' }}
       />
 
       {/* rarity badge */}
