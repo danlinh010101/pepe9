@@ -1,26 +1,37 @@
-import { Twitter, Send, MessageCircle, Globe } from 'lucide-react';
+import { Twitter, Send, MessageCircle, Globe, ArrowUpRight } from 'lucide-react';
 import { useReveal } from '@/hooks/useReveal';
+import { useTilt } from '@/hooks/useTilt';
 
 const SOCIALS = [
-  { icon: Twitter,      label: 'Twitter / X',  href: '#', handle: '@pepe' },
-  { icon: Send,         label: 'Telegram',     href: '#', handle: 't.me/pepe' },
-  { icon: MessageCircle,label: 'Discord',      href: '#', handle: 'discord.gg/pepe' },
-  { icon: Globe,        label: 'Website',      href: '#', handle: 'pepe.lol' },
+  { icon: Twitter,       label: 'Twitter / X',  href: '#', handle: '@pepe',     stat: '420K' },
+  { icon: Send,          label: 'Telegram',     href: '#', handle: 't.me/pepe',  stat: '180K' },
+  { icon: MessageCircle, label: 'Discord',      href: '#', handle: 'discord.gg', stat: '95K' },
+  { icon: Globe,         label: 'Website',       href: '#', handle: 'pepe.lol',   stat: '24/7' },
 ];
+
+const PEPE_IMG = 'https://ik.imagekit.io/zznoau6lx/bee56bec-991e-4e14-9f93-dbd941924657.png';
 
 export function Community() {
   const { ref, visible } = useReveal();
+  const tilt = useTilt<HTMLDivElement>(16);
 
   return (
-    <section id="community" ref={ref} className="relative py-28 px-6 overflow-hidden">
-      <div className="absolute inset-0 bg-grid-green opacity-50 pointer-events-none" />
+    <section id="community" ref={ref} className="relative py-32 px-6 overflow-hidden mesh-bg noise">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-green-500/10 rounded-full blur-[160px] pointer-events-none" />
 
-      <div className="relative max-w-4xl mx-auto text-center">
+      <div className="relative max-w-5xl mx-auto text-center">
+        {/* Floating pepe */}
+        <div className="flex justify-center mb-8 perspective-1000">
+          <div ref={tilt.ref} onMouseMove={tilt.onMove} onMouseLeave={tilt.onLeave} className="tilt-card relative w-40 h-40">
+            <div className="absolute inset-0 animate-spin-slow rounded-full" style={{ background: 'conic-gradient(from 0deg, transparent, rgba(74,222,128,0.4), transparent)' }} />
+            <img src={PEPE_IMG} alt="Pepe" className="relative w-full h-full object-contain animate-float drop-shadow-[0_0_40px_rgba(74,222,128,0.6)] tilt-inner" />
+          </div>
+        </div>
+
         <div className={`reveal ${visible ? 'is-visible' : ''}`}>
           <span className="text-green-400 text-sm font-bold tracking-[0.3em] uppercase">Join the Cult</span>
-          <h2 className="text-5xl md:text-8xl font-black text-white mt-4 tracking-tighter leading-none">
-            RIBBIT <span className="text-green-400 text-glow-green">TOGETHER</span>
+          <h2 className="text-6xl md:text-9xl font-black text-white mt-4 tracking-tighter leading-none">
+            RIBBIT <span className="text-glow-green text-green-400">TOGETHER</span>
           </h2>
           <p className="text-gray-400 max-w-xl mx-auto mt-6 text-lg">
             The strongest community in crypto. Hundreds of thousands of frogs, one mission:
@@ -33,21 +44,26 @@ export function Community() {
             <a
               key={s.label}
               href={s.href}
-              className={`group p-6 rounded-3xl border border-white/10 bg-white/[0.02] hover:border-green-500/40 hover:bg-green-500/[0.06] hover:-translate-y-1 transition-all duration-300 reveal ${visible ? 'is-visible' : ''}`}
+              className={`group relative p-6 rounded-3xl border border-white/10 bg-white/[0.02] hover:border-green-500/40 hover:bg-green-500/[0.06] hover:-translate-y-1 transition-all duration-300 reveal ${visible ? 'is-visible' : ''}`}
               style={{ transitionDelay: `${i * 80}ms` }}
             >
-              <s.icon className="w-8 h-8 text-green-400 mx-auto mb-3 group-hover:scale-125 transition-transform duration-300" />
+              <div className="flex items-center justify-between mb-3">
+                <s.icon className="w-7 h-7 text-green-400 group-hover:scale-125 transition-transform duration-300" />
+                <ArrowUpRight className="w-4 h-4 text-gray-600 group-hover:text-green-400 group-hover:rotate-45 transition-all duration-300" />
+              </div>
               <div className="text-white font-bold text-sm">{s.label}</div>
               <div className="text-gray-500 text-xs mt-1 font-mono">{s.handle}</div>
+              <div className="text-green-400 text-lg font-black mt-2">{s.stat}</div>
             </a>
           ))}
         </div>
 
         <a
-          href="#"
-          className={`inline-flex items-center gap-2.5 mt-12 px-10 py-4 rounded-full font-black text-black bg-green-400 hover:bg-green-300 text-xl transition-all duration-200 hover:scale-105 shadow-lg shadow-green-500/30 reveal ${visible ? 'is-visible' : ''}`}
+          href="#how-to-buy"
+          className={`group relative inline-flex items-center gap-3 mt-14 px-12 py-5 rounded-full font-black text-black bg-green-400 hover:bg-green-300 text-xl transition-all duration-200 hover:scale-105 shadow-lg shadow-green-500/30 overflow-hidden reveal ${visible ? 'is-visible' : ''}`}
         >
-          Buy $PEPE Now
+          <span className="relative z-10">Buy $PEPE Now</span>
+          <span className="absolute inset-0 aurora opacity-0 group-hover:opacity-100" />
         </a>
       </div>
     </section>
@@ -58,7 +74,7 @@ const CONTRACT = '0x6982508145454ce325ddbe47a25d4ec3d2311933';
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-green-500/20 bg-black px-6 py-14">
+    <footer className="relative border-t border-green-500/20 bg-black px-6 py-14 noise">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col items-center md:items-start gap-2">

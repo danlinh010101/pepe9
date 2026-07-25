@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, HelpCircle } from 'lucide-react';
 import { useReveal } from '@/hooks/useReveal';
 
 const FAQS = [
@@ -16,14 +16,17 @@ export function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" ref={ref} className="relative py-28 px-6 overflow-hidden">
+    <section id="faq" ref={ref} className="relative py-32 px-6 overflow-hidden">
       <div className="absolute top-1/3 right-0 w-80 h-80 bg-green-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative max-w-3xl mx-auto">
-        <div className={`text-center mb-16 reveal ${visible ? 'is-visible' : ''}`}>
-          <span className="text-green-400 text-sm font-bold tracking-[0.3em] uppercase">FAQ</span>
-          <h2 className="text-5xl md:text-7xl font-black text-white mt-4 tracking-tighter">
-            Got <span className="text-green-400 text-glow-green">Questions?</span>
+        <div className={`text-center mb-20 reveal ${visible ? 'is-visible' : ''}`}>
+          <div className="inline-flex items-center gap-2 mb-4">
+            <HelpCircle className="w-5 h-5 text-green-400" />
+            <span className="text-green-400 text-sm font-bold tracking-[0.3em] uppercase">FAQ</span>
+          </div>
+          <h2 className="glitch text-5xl md:text-8xl font-black text-white tracking-tighter leading-none" data-text="GOT QUESTIONS?">
+            GOT QUESTIONS?
           </h2>
         </div>
 
@@ -33,23 +36,28 @@ export function FAQ() {
             return (
               <div
                 key={i}
-                className={`rounded-2xl border transition-all duration-300 reveal ${visible ? 'is-visible' : ''} ${
-                  isOpen ? 'border-green-500/40 bg-green-500/[0.04]' : 'border-white/10 bg-white/[0.02]'
+                className={`group rounded-2xl border transition-all duration-300 overflow-hidden reveal ${visible ? 'is-visible' : ''} ${
+                  isOpen ? 'border-green-500/40 bg-green-500/[0.04] shadow-lg shadow-green-500/5' : 'border-white/10 bg-white/[0.02] hover:border-white/20'
                 }`}
                 style={{ transitionDelay: `${i * 60}ms` }}
               >
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
-                  className="w-full flex items-center justify-between gap-4 p-5 text-left"
+                  className="w-full flex items-center justify-between gap-4 p-6 text-left"
                 >
-                  <span className="text-white font-bold text-lg">{faq.q}</span>
-                  <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isOpen ? 'bg-green-400 text-black' : 'bg-white/10 text-green-400'}`}>
+                  <span className="flex items-center gap-4">
+                    <span className={`text-sm font-mono font-bold transition-colors ${isOpen ? 'text-green-400' : 'text-gray-600'}`}>
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="text-white font-bold text-lg">{faq.q}</span>
+                  </span>
+                  <span className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-green-400 text-black rotate-180' : 'bg-white/10 text-green-400 group-hover:bg-green-500/20'}`}>
                     {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                   </span>
                 </button>
                 <div className={`grid transition-all duration-300 ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                   <div className="overflow-hidden">
-                    <p className="px-5 pb-5 text-gray-400 leading-relaxed">{faq.a}</p>
+                    <p className="px-6 pb-6 pl-16 text-gray-400 leading-relaxed">{faq.a}</p>
                   </div>
                 </div>
               </div>

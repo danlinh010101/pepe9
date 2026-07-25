@@ -1,3 +1,4 @@
+import { CursorGlow } from '@/components/CursorGlow';
 import { Hero } from '@/components/Hero';
 import { Ticker } from '@/components/Ticker';
 import { About } from '@/components/About';
@@ -11,6 +12,7 @@ import { Community, Footer } from '@/components/Community';
 function App() {
   return (
     <div className="bg-black min-h-screen">
+      <CursorGlow />
       <Hero />
       <Ticker />
       <About />
