@@ -4,54 +4,65 @@ import { HeroScene } from '@/components/HeroScene';
 // Extra scroll distance while Hero is pinned (vh).
 const PEEL_VH = 55;
 
-/**
- * HeroCurtain owns ONLY the scroll transition.
- * It pins HeroScene for ~55vh, then translates the entire wrapper upward
- * as one physical sheet — revealing Impressions underneath.
- * It never touches HeroScene's internal transforms.
- */
 export function HeroCurtain() {
   const pinRef = useRef<HTMLDivElement>(null);
-  const curtainRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
   const rafRef = useRef<number>(0);
-  const tickingRef = useRef(false);
+  const activeRef = useRef(false);
+  const peelRef = useRef<number>(0);
 
   useEffect(() => {
-    const onScroll = () => {
-      if (!tickingRef.current) {
-        tickingRef.current = true;
-        rafRef.current = requestAnimationFrame(update);
-      }
+    const pin = pinRef.current;
+    const wrapper = wrapperRef.current;
+    if (!pin || !wrapper) return;
+
+    // ── Cache layout: read once per measure, not per frame ──
+    const measure = () => {
+      peelRef.current = Math.max(1, pin.offsetHeight - window.innerHeight);
     };
+    measure();
+    window.addEventListener('resize', measure, { passive: true });
 
+    // ── Single rAF loop — reads layout once, writes styles once ──
     const update = () => {
-      const pin = pinRef.current;
-      const curtain = curtainRef.current;
-      if (!pin || !curtain) { tickingRef.current = false; return; }
+      const rect = pin.getBoundingClientRect();
+      const peel = peelRef.current;
+      const progress = Math.max(0, Math.min(1, -rect.top / peel));
 
-      const pinRect = pin.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const peel = Math.max(1, pinRect.height - vh);
-      const progress = Math.max(0, Math.min(1, -pinRect.top / peel));
-
-      // Translate the entire Hero wrapper upward as one unit.
+      // Linear interpolation — Hero stays 1:1 attached to scroll.
+      // Lenis provides the inertial smoothing; the curtain itself does not ease.
       const ty = -progress * peel;
-      curtain.style.transform = `translate3d(0, ${ty.toFixed(2)}px, 0)`;
+      const scale = 1 - progress * 0.015;   // 1 → 0.985
+      const opacity = 1 - progress * 0.07;   // 1 → 0.93
+      const blur = progress * 3;             // 0 → 3px
 
-      // Keep updating while inside the pinned range.
+      // Write all styles in one batch — GPU-only compositor properties.
+      wrapper.style.transform =
+        `translate3d(0, ${ty.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+      wrapper.style.opacity = opacity.toFixed(4);
+      wrapper.style.filter = `blur(${blur.toFixed(2)}px)`;
+
       if (progress > 0.001 && progress < 0.999) {
         rafRef.current = requestAnimationFrame(update);
       } else {
-        tickingRef.current = false;
+        activeRef.current = false;
       }
     };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    tickingRef.current = true;
-    rafRef.current = requestAnimationFrame(update);
+    const kick = () => {
+      if (!activeRef.current) {
+        activeRef.current = true;
+        rafRef.current = requestAnimationFrame(update);
+      }
+    };
+
+    window.addEventListener('scroll', kick, { passive: true });
+    kick(); // set initial state
 
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', kick);
+      window.removeEventListener('resize', measure);
       cancelAnimationFrame(rafRef.current);
     };
   }, []);
@@ -62,12 +73,20 @@ export function HeroCurtain() {
       className="relative"
       style={{ height: `calc(100vh + ${PEEL_VH}vh)`, backgroundColor: '#032312' }}
     >
-      <div
-        ref={curtainRef}
-        className="sticky top-0 h-screen will-change-transform z-30"
-      >
-        <HeroScene />
+      {/* Sticky — never transformed, never animated */}
+      <div className="sticky top-0 h-screen overflow-hidden z-30">
+        {/* HeroWrapper — the ONLY element that receives transform/opacity/filter */}
+        <div
+          ref={wrapperRef}
+          className="h-screen"
+          style={{ willChange: 'transform, opacity, filter' }}
+        >
+          <HeroScene />
+        </div>
       </div>
     </div>
   );
 }
+
+
+export { HeroCurtain }

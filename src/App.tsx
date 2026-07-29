@@ -1,7 +1,7 @@
 import { CursorGlow } from '@/components/CursorGlow';
 import { HeroCurtain } from '@/components/HeroCurtain';
-import { Impressions } from '@/components/Impressions';
 import { GlobalFollowers } from '@/components/GlobalFollowers';
+import { Impressions } from '@/components/Impressions';
 import { Tokenomics } from '@/components/Tokenomics';
 import { HowToBuy } from '@/components/HowToBuy';
 import { Community, Footer } from '@/components/Community';
@@ -15,8 +15,8 @@ function App() {
     <div className="bg-black min-h-screen">
       <CursorGlow />
       <HeroCurtain />
-      <Impressions />
       <GlobalFollowers />
+      <Impressions />
       <Tokenomics />
       <HowToBuy />
       <Community />
