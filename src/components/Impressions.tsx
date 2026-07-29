@@ -506,7 +506,7 @@ c.el.style.transform =
               fontSize: 'clamp(2.8rem, 9vw, 7rem)',
               lineHeight: 1,
               letterSpacing: '-0.02em',
-              color: '#ff5b5b',
+              color: '#ffd54a',
               textShadow: glowPulse
   ? '0 0 16px rgba(74,222,128,.28), 0 0 28px rgba(74,222,128,.12), 0 3px 10px rgba(0,0,0,.55)'
   : '0 0 10px rgba(74,222,128,.12), 0 3px 10px rgba(0,0,0,.45)',
