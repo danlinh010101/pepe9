@@ -588,7 +588,9 @@ function OdometerSlot({ digit }: { digit: string }) {
       <span
         ref={reelRef}
         className="imp-odo-reel"
-        style={{ transform: `translateY(-${posRef.current * 100}%)` }}
+        style={{
+    transform:`translate3d(0,-${posRef.current * 100}%,0)`
+}}
       >
         {reel.map((v, j) => (
           <span key={j} className="imp-odo-cell" style={{ height: '1em' }}>
