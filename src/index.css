@@ -348,4 +348,29 @@
   .imp-gold-shimmer {
     animation: impGoldShimmer 1.2s ease-in-out infinite;
   }
+
+  /* ── Rolling odometer ── */
+  .imp-odo {
+    display: inline-flex;
+    align-items: baseline;
+    overflow: hidden;
+    vertical-align: top;
+  }
+  .imp-odo-slot {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    vertical-align: top;
+  }
+  .imp-odo-reel {
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .imp-odo-cell {
+    display: block;
+    text-align: center;
+    line-height: 1;
+  }
 }

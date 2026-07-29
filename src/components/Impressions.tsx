@@ -28,19 +28,40 @@ const VZ_MAX = 0.00165;
 // Base card size at z=0.5 in px (true pixel size controlled by scale)
 const BASE_CARD_PX = 90;
 
-// Counter: target advances by this many per second on average
-const COUNTER_RATE = 3.1; // ~3 increments/sec displayed
+// Pool sizes — small, spacious scene
+const POOL_DESKTOP = 8;
+const POOL_TABLET  = 6;
+const POOL_MOBILE  = 5;
 
-// Pool sizes
-const POOL_DESKTOP = 36;
-const POOL_TABLET  = 24;
-const POOL_MOBILE  = 14;
+// Sectors around the counter for balanced distribution
+const NUM_SECTORS = 8;
+
+// Counter: realistic internet activity increments
+const INCREMENT_TABLE = [
+  { value: 15,     weight: 38 },
+  { value: 80,     weight: 26 },
+  { value: 350,    weight: 18 },
+  { value: 2500,   weight: 12 },
+  { value: 12000,  weight: 6 },
+];
+const INCREMENT_INTERVAL_MS = 1400; // avg time between target bumps
 
 function poolSize() {
   const w = typeof window !== 'undefined' ? window.innerWidth : 1280;
   if (w < 768) return POOL_MOBILE;
   if (w < 1280) return POOL_TABLET;
   return POOL_DESKTOP;
+}
+
+// Pick a weighted random increment from the table
+function pickIncrement(): number {
+  const total = INCREMENT_TABLE.reduce((s, e) => s + e.weight, 0);
+  let r = Math.random() * total;
+  for (const e of INCREMENT_TABLE) {
+    r -= e.weight;
+    if (r <= 0) return e.value;
+  }
+  return INCREMENT_TABLE[0].value;
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -93,6 +114,13 @@ function depthScale(z: number): number {
   return 0.28 + Math.pow(z, 1.55) * 1.18;
 }
 
+// Subtle brightness curve: far ~0.87, mid 1.0, near ~1.08 before fade
+function depthBrightness(z: number): number {
+  if (z < 0.30) return 0.87 + (z / 0.30) * 0.13;       // 0.87 → 1.0
+  if (z < 0.78) return 1.0;                             // full
+  return 1.0 + Math.min(1, (z - 0.78) / 0.22) * 0.08;  // 1.0 → 1.08
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 export function Impressions() {
   const { ref, visible } = useReveal();
@@ -106,7 +134,6 @@ export function Impressions() {
   const fieldH      = useRef(0);
 
   // Counter — live, smooth
-  const [displayCount, setDisplayCount] = useState(START_COUNT);
   const [shake, setShake] = useState(false);
   const [glowPulse, setGlowPulse] = useState(false);
   const shakeTO = useRef<number | undefined>(undefined);
@@ -114,23 +141,36 @@ export function Impressions() {
   // Counter internal state (no React state for the hot path)
   const displayRef = useRef(START_COUNT);
   const targetRef  = useRef(START_COUNT + 120); // small head start
-  const lastImgAssigned = useRef(-1); // avoid repeating same image twice in a row
+  const lastBumpRef = useRef(0); // timestamp of last target bump
+
+  // Odometer: per-digit displayed values and previous values for rolling
+  const [odoDigits, setOdoDigits] = useState<string[]>(START_COUNT.toLocaleString('en-US').split(''));
+  const odoPrevRef = useRef<string[]>(START_COUNT.toLocaleString('en-US').split(''));
 
   // ── Spawn card ──────────────────────────────────────────────────────────────
-  const spawnCard = (card: Card, spreadZ = false) => {
+  // sectorHint: when recycling, caller picks a sector with fewest active cards
+  const spawnCard = (card: Card, spreadZ = false, sectorHint = -1) => {
     const w = fieldW.current;
     const h = fieldH.current;
 
-    // Center-weighted distribution
-    const rx = centeredRand(); // [-1,1], biased toward 0
-    const ry = centeredRand();
+    // Forbidden zone: invisible ring around the counter
+    const minR = Math.min(w, h) * 0.26; // generous padding around counter
+    const maxR = Math.min(w, h) * 0.52;
 
-    // spread cards across a viewport-relative area
-    const halfSpreadX = w * 0.42;
-    const halfSpreadY = h * 0.36;
+    // Pick an angle — either from sector hint or random
+    let angle: number;
+    if (sectorHint >= 0) {
+      angle = (sectorHint / NUM_SECTORS) * Math.PI * 2 + (Math.random() - 0.5) * (Math.PI * 2 / NUM_SECTORS) * 0.7;
+    } else {
+      angle = Math.random() * Math.PI * 2;
+    }
 
-    card.x0 = rx * halfSpreadX;
-    card.y0 = ry * halfSpreadY;
+    // Radius: outside the forbidden ring, weighted toward outer edge
+    const t = 0.45 + Math.random() * 0.55; // 0.45–1.0 of [minR,maxR]
+    const radius = minR + (maxR - minR) * t;
+
+    card.x0 = Math.cos(angle) * radius;
+    card.y0 = Math.sin(angle) * radius;
     card.x  = card.x0;
     card.y  = card.y0;
 
@@ -154,6 +194,26 @@ export function Impressions() {
 
     card.active = true;
     card.el.style.opacity = '0';
+  };
+
+  // Pick the sector with the fewest active cards (for balanced distribution)
+  const pickBalancedSector = (): number => {
+    const pool = poolRef.current;
+    const counts = new Array(NUM_SECTORS).fill(0);
+    for (const c of pool) {
+      if (!c.active) continue;
+      const ang = Math.atan2(c.y0, c.x0);
+      let s = Math.floor(((ang + Math.PI) / (Math.PI * 2)) * NUM_SECTORS);
+      if (s < 0) s = 0;
+      if (s >= NUM_SECTORS) s = NUM_SECTORS - 1;
+      counts[s]++;
+    }
+    // Find min count sectors, pick randomly among ties
+    let min = Infinity;
+    for (const c of counts) if (c < min) min = c;
+    const candidates: number[] = [];
+    for (let i = 0; i < NUM_SECTORS; i++) if (counts[i] === min) candidates.push(i);
+    return candidates[Math.floor(Math.random() * candidates.length)];
   };
 
   // ── Build pool ──────────────────────────────────────────────────────────────
@@ -243,30 +303,35 @@ export function Impressions() {
         c.driftPhase += 0.006 * dt; // very slow drift cycle
 
         if (c.z >= Z_NEAR) {
-          // Recycle — invisible reset
+          // Recycle — invisible reset, balanced sector
           c.el.style.opacity = '0';
           c.active = false;
-          spawnCard(c, false);
+          spawnCard(c, false, pickBalancedSector());
           continue;
         }
 
         const scale    = depthScale(c.z);
         const opacity  = depthOpacity(c.z);
         const blur     = depthBlur(c.z);
+        const bright   = depthBrightness(c.z);
         const cardPx   = BASE_CARD_PX * scale;
 
         // Drift — 90% forward (z), 10% lateral
         const drift = Math.sin(c.driftPhase) * c.driftAmp;
 
-        // Screen position: project from world center
-        // As z increases, objects appear to expand outward from center
-        const perspFactor = 0.3 + c.z * 0.7; // simulated perspective compression
+        // Screen position: aggressive radial expansion as z → 1
+        // perspFactor grows non-linearly so near cards fly outward
+        const perspFactor = 0.25 + Math.pow(c.z, 1.8) * 1.55;
         const sx = cx + (c.x0 + drift) * perspFactor - cardPx / 2;
         const sy = cy + c.y0 * perspFactor - cardPx / 2;
 
         c.el.style.transform = `translate3d(${sx}px,${sy}px,0) scale(${scale}) rotate(${c.tilt * (1 - c.z * 0.6)}deg)`;
         c.el.style.opacity = String(opacity.toFixed(3));
-        c.el.style.filter = blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : '';
+        // Combine blur + brightness via filter
+        const filters: string[] = [];
+        if (blur > 0.05) filters.push(`blur(${blur.toFixed(2)}px)`);
+        if (Math.abs(bright - 1) > 0.005) filters.push(`brightness(${bright.toFixed(3)})`);
+        c.el.style.filter = filters.join(' ');
 
         // Proximity detection for counter reaction
         if (counter && opacity > 0.6 && scale > 0.65) {
@@ -301,30 +366,39 @@ export function Impressions() {
   }, [visible]);
 
   // ── Counter animation loop ───────────────────────────────────────────────────
-  // Uses a spring-interpolation approach:
-  //  - targetRef advances at COUNTER_RATE /sec (smooth, no spikes)
-  //  - displayRef chases targetRef with a lerp factor → smooth odometer feel
+  // Realistic internet activity:
+  //  - target bumps by weighted random increments at intervals
+  //  - display chases target with spring interpolation → smooth odometer
   useEffect(() => {
     if (!visible) return;
     let last = performance.now();
+    lastBumpRef.current = last;
+    let lastRounded = START_COUNT;
 
     const loop = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.1); // seconds, capped
       last = now;
 
-      // Advance target at a steady rate with tiny jitter (±15%)
-      const jitter = 0.85 + Math.random() * 0.30;
-      targetRef.current += COUNTER_RATE * jitter * dt;
+      // Bump the target with realistic increments at intervals
+      const sinceBump = now - lastBumpRef.current;
+      const interval = INCREMENT_INTERVAL_MS * (0.6 + Math.random() * 0.8);
+      if (sinceBump > interval) {
+        targetRef.current += pickIncrement();
+        lastBumpRef.current = now;
+      }
 
-      // Lerp display toward target — factor ~4 gives smooth, slightly lagging catch-up
+      // Spring-interpolate display toward target
+      // Use a higher factor for large gaps so big bumps are absorbed smoothly
       const gap = targetRef.current - displayRef.current;
-      displayRef.current += gap * Math.min(1, 4.5 * dt);
+      const factor = Math.min(1, (3.2 + Math.min(2, Math.log10(Math.abs(gap) + 1) * 1.5)) * dt);
+      displayRef.current += gap * factor;
 
       const rounded = Math.floor(displayRef.current);
-      if (rounded !== Math.floor(displayRef.current - gap * Math.min(1, 4.5 * dt))) {
-        setDisplayCount(rounded);
-      } else {
-        setDisplayCount(rounded);
+      if (rounded !== lastRounded) {
+        lastRounded = rounded;
+        const newDigits = rounded.toLocaleString('en-US').split('');
+        odoPrevRef.current = odoDigits;
+        setOdoDigits(newDigits);
       }
 
       rafCntRef.current = requestAnimationFrame(loop);
@@ -332,9 +406,8 @@ export function Impressions() {
 
     rafCntRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafCntRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
-
-  const display = displayCount.toLocaleString('en-US');
 
   return (
     <section
@@ -404,22 +477,7 @@ export function Impressions() {
               transition: 'text-shadow 0.35s ease',
             }}
           >
-            {display.split('').map((d, i) => {
-              const isDigit = d >= '0' && d <= '9';
-              return (
-                <span
-                  key={i}
-                  className="imp-digit"
-                  style={{
-                    display: 'inline-block',
-                    minWidth: isDigit ? '0.58em' : '0.28em',
-                    textAlign: 'center',
-                  }}
-                >
-                  {d}
-                </span>
-              );
-            })}
+            <Odometer digits={odoDigits} prevDigits={odoPrevRef.current} />
           </div>
         </div>
 
@@ -459,3 +517,71 @@ export function Impressions() {
     </section>
   );
 }
+
+// ─── Rolling odometer ─────────────────────────────────────────────────────────
+// Each digit slot slides upward independently. When a digit changes, the reel
+// transitions from the old digit to the new digit with a cubic-bezier ease.
+// Commas are rendered as static (non-rolling) slots.
+function Odometer({ digits, prevDigits }: { digits: string[]; prevDigits: string[] }) {
+  return (
+    <span className="imp-odo">
+      {digits.map((d, i) => {
+        const isDigit = d >= '0' && d <= '9';
+        const prev = prevDigits[i] ?? d;
+
+        if (!isDigit) {
+          return (
+            <span
+              key={i}
+              className="imp-odo-slot"
+              style={{ width: '0.28em', textAlign: 'center' }}
+            >
+              {d}
+            </span>
+          );
+        }
+
+        const from = parseInt(prev, 10);
+        const to = parseInt(d, 10);
+        // Build a reel: [from, from+1 ... to] wrapping 0-9. If from===to, still
+        // render a single cell (no movement) — but to keep it alive we render
+        // the full 0-9 strip and translate to the target index.
+        const reel: number[] = [];
+        if (from === to) {
+          reel.push(from);
+        } else {
+          let cur = from;
+          reel.push(cur);
+          while (cur !== to) {
+            cur = (cur + 1) % 10;
+            reel.push(cur);
+          }
+        }
+
+        return (
+          <span
+            key={i}
+            className="imp-odo-slot"
+            style={{ width: '0.58em', height: '1em', textAlign: 'center' }}
+          >
+            <span
+              className="imp-odo-reel"
+              style={{
+                transform: `translateY(-${(reel.length - 1) * 100}%)`,
+              }}
+            >
+              {reel.map((v, j) => (
+                <span key={j} className="imp-odo-cell" style={{ height: '1em' }}>
+                  {v}
+                </span>
+              ))}
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+
+export { Impressions }
