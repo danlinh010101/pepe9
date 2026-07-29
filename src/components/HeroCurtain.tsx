@@ -87,6 +87,3 @@ export function HeroCurtain() {
     </div>
   );
 }
-
-
-export { HeroCurtain }
