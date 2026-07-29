@@ -1,356 +1,362 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReveal } from '@/hooks/useReveal';
 
-/**
- * "Total Pepe Meme Impressions" — a live, never-stopping counter with a
- * pooled 3D floating-object system behind it.
- *
- * - Counter animates via requestAnimationFrame (organic random increments).
- * - Floating objects are pooled (30–50), reused forever, simulated in fake 3D
- *   (depth → scale, blur, opacity) with organic drift + rotation.
- * - Rare Golden Pepe spawns every 20–30s with stronger glow.
- * - When a large sticker passes close to the counter, the counter reacts
- *   subtly (tiny shake / glow) and returns to normal.
- */
-
-const START_COUNT = 779711289;
-
-const OBJECT_ASSETS: { src: string; type: string }[] = [
-  { src: 'https://ik.imagekit.io/zznoau6lx/327fc132-f7cb-4027-a2fe-9b5f5ff42f9e.png', type: 'pepe' },
-  { src: 'https://ik.imagekit.io/zznoau6lx/4efe7296-c637-47af-92da-4be859f4bb17.png', type: 'pepe' },
-  { src: 'https://ik.imagekit.io/zznoau6lx/ab6607fb-6001-461c-97d7-ae4f1011db73.png', type: 'pepe' },
-  { src: 'https://ik.imagekit.io/zznoau6lx/bee56bec-991e-4e14-9f93-dbd941924657.png', type: 'rarepepe' },
-  { src: 'https://ik.imagekit.io/zznoau6lx/603878db-f2b1-489a-904b-0cf60136067d.png', type: 'rarepepe' },
-  { src: 'https://ik.imagekit.io/zznoau6lx/b4084e0f-7c91-4aa7-8a87-cba98fa11496.png', type: 'rarepepe' },
-  { src: 'https://ik.imagekit.io/zznoau6lx/c72a7c09-7dbe-4306-bbb9-aa493129b7c8.png', type: 'rarepepe' },
-  { src: 'https://ik.imagekit.io/zznoau6lx/867e7beb-1941-4ade-8b43-890f105c7c2b.png', type: 'rarepepe' },
-  { src: 'https://ik.imagekit.io/zznoau6lx/ba586cbf-9111-4337-a242-adf42ef3ed08.png', type: 'rarepepe' },
+// ─── Image assets ────────────────────────────────────────────────────────────
+const CARD_IMAGES = [
+  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/loadingBackground.jpg?updatedAt=1785302424340',
+  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/MV5BODU3NTA3ZWQtNDkyZi00NjM2LWI1NDUtNjBlNGVmZmQ0NGZjXkEyXkFqcGc@._V1_.webp?updatedAt=1785252491298',
+  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/rebecca.webp?updatedAt=1785252491273',
+  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/wp11496855_mPEmctV-P.webp?updatedAt=1785252491248',
+  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/david2.webp?updatedAt=1785251906096',
+  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/loadingBackground%20(1).webp?updatedAt=1785238535218',
+  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/wp11496855.webp?updatedAt=1785236346465',
+  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/wp11501455-lucy-cyberpunk-wallpapers.webp?updatedAt=1785236345822',
+  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/wp14146052-cyberpunk-edgerunners-desktop-wallpapers.webp?updatedAt=1785235625688',
 ];
 
-const GOLD_PEPE_SRC = 'https://ik.imagekit.io/zznoau6lx/ba586cbf-9111-4337-a242-adf42ef3ed08.png';
+// ─── Constants ───────────────────────────────────────────────────────────────
+const START_COUNT = 779_711_289;
 
-const SVG_OBJECTS = ['dollarbag', 'dollarbill', 'rocket', 'candle', 'diamond', 'coin', 'sticker', 'sunglasses'] as const;
-type SvgType = (typeof SVG_OBJECTS)[number];
+// z travels from Z_FAR → Z_NEAR; object is recycled when z >= Z_NEAR
+const Z_FAR = 0.0;
+const Z_NEAR = 1.0;
 
-type ObjType = 'image' | 'svg' | 'gold';
+// vz per frame at 60fps — tuned for 8–12s journey
+const VZ_MIN = 0.00115;
+const VZ_MAX = 0.00165;
 
-type PooledObj = {
-  el: HTMLDivElement;
-  inner: HTMLDivElement;
-  type: ObjType;
-  // state
-  x: number; y: number;
-  vx: number; vy: number;
-  z: number; vz: number;
-  scale: number;
-  rotation: number; rotSpeed: number;
-  baseOpacity: number;
-  driftPhase: number; driftAmp: number;
-  oscPhase: number; oscAmp: number;
-  active: boolean;
-  isGold: boolean;
-};
+// Base card size at z=0.5 in px (true pixel size controlled by scale)
+const BASE_CARD_PX = 90;
 
-const POOL_SIZE_DESKTOP = 42;
-const POOL_SIZE_TABLET = 28;
-const POOL_SIZE_MOBILE = 16;
+// Counter: target advances by this many per second on average
+const COUNTER_RATE = 3.1; // ~3 increments/sec displayed
 
-function getPoolSize() {
+// Pool sizes
+const POOL_DESKTOP = 36;
+const POOL_TABLET  = 24;
+const POOL_MOBILE  = 14;
+
+function poolSize() {
   const w = typeof window !== 'undefined' ? window.innerWidth : 1280;
-  if (w < 768) return POOL_SIZE_MOBILE;
-  if (w < 1280) return POOL_SIZE_TABLET;
-  return POOL_SIZE_DESKTOP;
+  if (w < 768) return POOL_MOBILE;
+  if (w < 1280) return POOL_TABLET;
+  return POOL_DESKTOP;
 }
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+type Card = {
+  el: HTMLDivElement;
+  img: HTMLImageElement;
+  // World coords  —  x/y in px relative to field center, z in [0,1]
+  x0: number;    // spawn x offset from center
+  y0: number;    // spawn y offset from center
+  x: number;     // current x
+  y: number;     // current y
+  z: number;
+  vz: number;
+  // Subtle horizontal drift
+  driftAmp: number;
+  driftPhase: number;
+  // Fixed tilt baked in at spawn (max ±8°)
+  tilt: number;
+  active: boolean;
+  lastImgIdx: number;
+};
+
+// ─── Gaussian-ish center-weighted random (±1 sigma mapped to [-1,1]) ─────────
+function centeredRand(): number {
+  // Sum of 3 uniforms → roughly normal, clamped to [-1,1]
+  const s = (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
+  return Math.max(-1, Math.min(1, s));
+}
+
+// ─── Depth curves ─────────────────────────────────────────────────────────────
+// z in [0,1] → [0,1]
+function depthOpacity(z: number): number {
+  // invisible at z=0, ramps up by z=0.15, full at z=0.30, full until z=0.75,
+  // fades to 0 at z=1.0
+  if (z < 0.15) return z / 0.15;
+  if (z < 0.75) return 1.0;
+  return Math.max(0, (1.0 - z) / 0.25);
+}
+
+function depthBlur(z: number): number {
+  // far: up to 3px, mid: 0, near: up to 2px
+  if (z < 0.30) return (1 - z / 0.30) * 3.0;
+  if (z > 0.78) return ((z - 0.78) / 0.22) * 2.0;
+  return 0;
+}
+
+// scale: card should be ~50px at z=0.1, ~90px at z=0.55, ~145px at z=0.95
+function depthScale(z: number): number {
+  // exponential-ish: small exponent makes it feel like real perspective
+  return 0.28 + Math.pow(z, 1.55) * 1.18;
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export function Impressions() {
   const { ref, visible } = useReveal();
-  const counterRef = useRef<HTMLDivElement>(null);
-  const counterWrapRef = useRef<HTMLDivElement>(null);
-  const fieldRef = useRef<HTMLDivElement>(null);
-  const poolRef = useRef<PooledObj[]>([]);
-  const rafRef = useRef<number>(0);
-  const lastTimeRef = useRef<number>(0);
-  const lastSpawnRef = useRef<number>(0);
-  const nextGoldRef = useRef<number>(0);
-  const goldActiveRef = useRef<boolean>(false);
-  const fieldWRef = useRef<number>(0);
-  const fieldHRef = useRef<number>(0);
-  const dprRef = useRef<number>(1);
+  const fieldRef    = useRef<HTMLDivElement>(null);
+  const counterRef  = useRef<HTMLDivElement>(null);
+  const poolRef     = useRef<Card[]>([]);
+  const rafObjRef   = useRef<number>(0);
+  const rafCntRef   = useRef<number>(0);
+  const lastObjTime = useRef(0);
+  const fieldW      = useRef(0);
+  const fieldH      = useRef(0);
 
-  // Live counter state
-  const [count, setCount] = useState(START_COUNT);
+  // Counter — live, smooth
+  const [displayCount, setDisplayCount] = useState(START_COUNT);
   const [shake, setShake] = useState(false);
-  const [glow, setGlow] = useState(false);
-  const countRef = useRef(START_COUNT);
-  const shakeTimeoutRef = useRef<number | undefined>(undefined);
+  const [glowPulse, setGlowPulse] = useState(false);
+  const shakeTO = useRef<number | undefined>(undefined);
 
-  // Spawn a pooled object (reset its state)
-  const spawn = (obj: PooledObj, isGold = false) => {
-    const w = fieldWRef.current;
-    const h = fieldHRef.current;
-    obj.x = Math.random() * w;
-    obj.y = h * 0.35 + Math.random() * h * 0.4;
-    obj.z = 0.04 + Math.random() * 0.06;
-    obj.vz = 0.0018 + Math.random() * 0.0028;
-    obj.vx = (Math.random() - 0.5) * 0.25;
-    obj.vy = -(Math.random() * 0.18 + 0.04);
-    obj.scale = 0.12;
-    obj.rotation = Math.random() * 360;
-    obj.rotSpeed = (Math.random() - 0.5) * 1.6;
-    obj.baseOpacity = 0.55 + Math.random() * 0.4;
-    obj.driftPhase = Math.random() * Math.PI * 2;
-    obj.driftAmp = 0.3 + Math.random() * 0.6;
-    obj.oscPhase = Math.random() * Math.PI * 2;
-    obj.oscAmp = 0.15 + Math.random() * 0.3;
-    obj.active = true;
-    obj.isGold = isGold;
+  // Counter internal state (no React state for the hot path)
+  const displayRef = useRef(START_COUNT);
+  const targetRef  = useRef(START_COUNT + 120); // small head start
+  const lastImgAssigned = useRef(-1); // avoid repeating same image twice in a row
 
-    const inner = obj.inner;
-    if (isGold) {
-      inner.style.filter = 'drop-shadow(0 0 14px rgba(251,191,36,0.9)) drop-shadow(0 0 28px rgba(251,191,36,0.5))';
-    } else {
-      inner.style.filter = '';
-    }
+  // ── Spawn card ──────────────────────────────────────────────────────────────
+  const spawnCard = (card: Card, spreadZ = false) => {
+    const w = fieldW.current;
+    const h = fieldH.current;
+
+    // Center-weighted distribution
+    const rx = centeredRand(); // [-1,1], biased toward 0
+    const ry = centeredRand();
+
+    // spread cards across a viewport-relative area
+    const halfSpreadX = w * 0.42;
+    const halfSpreadY = h * 0.36;
+
+    card.x0 = rx * halfSpreadX;
+    card.y0 = ry * halfSpreadY;
+    card.x  = card.x0;
+    card.y  = card.y0;
+
+    // Stagger z on initial fill so screen isn't empty
+    card.z  = spreadZ ? Math.random() : Z_FAR + Math.random() * 0.04;
+    card.vz = VZ_MIN + Math.random() * (VZ_MAX - VZ_MIN);
+
+    // Tiny horizontal drift — max ±12px total displacement over journey
+    card.driftAmp   = Math.random() * 10;
+    card.driftPhase = Math.random() * Math.PI * 2;
+
+    // Tilt baked at spawn: stays constant per card, ±8°
+    card.tilt = (Math.random() - 0.5) * 16;
+
+    // Avoid same image twice consecutively
+    let imgIdx: number;
+    do { imgIdx = Math.floor(Math.random() * CARD_IMAGES.length); }
+    while (imgIdx === card.lastImgIdx && CARD_IMAGES.length > 1);
+    card.lastImgIdx = imgIdx;
+    if (card.img.src !== CARD_IMAGES[imgIdx]) card.img.src = CARD_IMAGES[imgIdx];
+
+    card.active = true;
+    card.el.style.opacity = '0';
   };
 
-  // Build the pool once
+  // ── Build pool ──────────────────────────────────────────────────────────────
   useEffect(() => {
     const field = fieldRef.current;
     if (!field) return;
 
-    const poolSize = getPoolSize();
-    const pool: PooledObj[] = [];
+    const n = poolSize();
+    const pool: Card[] = [];
 
-    for (let i = 0; i < poolSize; i++) {
-      const el = document.createElement('div');
-      el.className = 'imp-obj';
-      const inner = document.createElement('div');
-      inner.className = 'imp-obj-inner';
-      el.appendChild(inner);
+    for (let i = 0; i < n; i++) {
+      const el  = document.createElement('div');
+      el.style.cssText = [
+        'position:absolute',
+        'top:0',
+        'left:0',
+        `width:${BASE_CARD_PX}px`,
+        `height:${BASE_CARD_PX}px`,
+        'will-change:transform,opacity',
+        'pointer-events:none',
+        'border-radius:14px',
+        'overflow:hidden',
+        'box-shadow:0 4px 24px rgba(0,0,0,0.55)',
+        'opacity:0',
+        'backface-visibility:hidden',
+      ].join(';');
 
-      // Decide type
-      const r = Math.random();
-      let type: ObjType;
-      if (r < 0.55) type = 'image';
-      else type = 'svg';
-
-      if (type === 'image') {
-        const asset = OBJECT_ASSETS[Math.floor(Math.random() * OBJECT_ASSETS.length)];
-        const img = document.createElement('img');
-        img.src = asset.src;
-        img.alt = '';
-        img.draggable = false;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'contain';
-        img.style.mixBlendMode = 'screen';
-        inner.appendChild(img);
-      } else {
-        const svgType = SVG_OBJECTS[Math.floor(Math.random() * SVG_OBJECTS.length)];
-        const wrapper = document.createElement('div');
-        wrapper.style.width = '100%';
-        wrapper.style.height = '100%';
-        wrapper.style.display = 'flex';
-        wrapper.style.alignItems = 'center';
-        wrapper.style.justifyContent = 'center';
-        // Render SVG via innerHTML using a data approach — simpler: use React portal? No, just build markup.
-        wrapper.innerHTML = svgMarkup(svgType);
-        inner.appendChild(wrapper);
-      }
-
+      const img = document.createElement('img');
+      img.draggable = false;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none';
+      el.appendChild(img);
       field.appendChild(el);
-      const obj: PooledObj = {
-        el, inner, type,
-        x: 0, y: 0, vx: 0, vy: 0, z: 0, vz: 0, scale: 0,
-        rotation: 0, rotSpeed: 0, baseOpacity: 0,
-        driftPhase: 0, driftAmp: 0, oscPhase: 0, oscAmp: 0,
-        active: false, isGold: false,
+
+      const card: Card = {
+        el, img,
+        x0: 0, y0: 0, x: 0, y: 0,
+        z: 0, vz: 0,
+        driftAmp: 0, driftPhase: 0,
+        tilt: 0, active: false, lastImgIdx: -1,
       };
-      pool.push(obj);
+      pool.push(card);
     }
 
     poolRef.current = pool;
-    nextGoldRef.current = performance.now() + 20000 + Math.random() * 10000;
 
     const measure = () => {
-      fieldWRef.current = field.clientWidth;
-      fieldHRef.current = field.clientHeight;
-      dprRef.current = Math.min(window.devicePixelRatio || 1, 2);
+      fieldW.current = field.clientWidth;
+      fieldH.current = field.clientHeight;
     };
     measure();
     window.addEventListener('resize', measure);
 
+    // Fill pool with staggered z so the field is populated immediately
+    for (let i = 0; i < n; i++) spawnCard(pool[i], true);
+
     return () => {
       window.removeEventListener('resize', measure);
-      pool.forEach((o) => o.el.remove());
+      pool.forEach((c) => c.el.remove());
       poolRef.current = [];
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Animation loop (objects + counter)
+  // ── Object animation loop ───────────────────────────────────────────────────
   useEffect(() => {
     if (!visible) return;
-    const field = fieldRef.current;
     const counter = counterRef.current;
-    if (!field || !counter) return;
-
-    lastTimeRef.current = performance.now();
-    lastSpawnRef.current = lastTimeRef.current;
+    const w = () => fieldW.current;
+    const h = () => fieldH.current;
+    let last = performance.now();
 
     const loop = (now: number) => {
-      const dt = Math.min((now - lastTimeRef.current) / 16.67, 3);
-      lastTimeRef.current = now;
-      const w = fieldWRef.current;
-      const h = fieldHRef.current;
-      const pool = poolRef.current;
+      const dt = Math.min((now - last) / 16.667, 3.0);
+      last = now;
 
-      // Counter rect for proximity reaction
-      const cRect = counter.getBoundingClientRect();
-      const fRect = field.getBoundingClientRect();
-      const cx = cRect.left + cRect.width / 2 - fRect.left;
-      const cy = cRect.top + cRect.height / 2 - fRect.top;
+      const pool = poolRef.current;
+      const cx = w() / 2;
+      const cy = h() / 2;
 
       let nearCounter = false;
 
-      // Update objects
       for (let i = 0; i < pool.length; i++) {
-        const o = pool[i];
-        if (!o.active) continue;
+        const c = pool[i];
+        if (!c.active) continue;
 
-        o.z += o.vz * dt;
-        o.x += o.vx * dt;
-        o.y += o.vy * dt;
-        o.rotation += o.rotSpeed * dt;
-        o.driftPhase += 0.018 * dt;
-        o.oscPhase += 0.04 * dt;
+        c.z += c.vz * dt;
+        c.driftPhase += 0.006 * dt; // very slow drift cycle
 
-        const depth = Math.min(o.z, 1);
-        const scale = 0.12 + depth * (o.isGold ? 1.7 : 1.4);
-        const blur = Math.max(0, (1 - depth) * 7);
-        let opacity = depth < 0.12 ? (depth / 0.12) * o.baseOpacity : o.baseOpacity;
-        if (depth > 0.82) opacity = Math.max(0, (1 - depth) / 0.18 * o.baseOpacity);
-
-        const drift = Math.sin(o.driftPhase) * o.driftAmp * 8;
-        const osc = Math.sin(o.oscPhase) * o.oscAmp * 5;
-
-        const px = o.x + drift;
-        const py = o.y + osc;
-
-        o.el.style.transform = `translate3d(${px - scale * 50}px, ${py - scale * 50}px, 0) scale(${scale})`;
-        o.el.style.opacity = String(opacity);
-        o.inner.style.transform = `rotate(${o.rotation}deg)`;
-        o.inner.style.filter = blur > 0.1 ? `blur(${blur}px)` : '';
-        if (o.isGold && blur <= 0.1) {
-          o.inner.style.filter = 'drop-shadow(0 0 14px rgba(251,191,36,0.9)) drop-shadow(0 0 28px rgba(251,191,36,0.5))';
+        if (c.z >= Z_NEAR) {
+          // Recycle — invisible reset
+          c.el.style.opacity = '0';
+          c.active = false;
+          spawnCard(c, false);
+          continue;
         }
 
-        // Proximity to counter
-        if (depth > 0.5 && depth < 0.85) {
-          const dx = px - cx;
-          const dy = py - cy;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 160 && scale > 0.7) nearCounter = true;
-        }
+        const scale    = depthScale(c.z);
+        const opacity  = depthOpacity(c.z);
+        const blur     = depthBlur(c.z);
+        const cardPx   = BASE_CARD_PX * scale;
 
-        if (depth >= 1 || py > h + 100 || py < -200 || px < -200 || px > w + 200) {
-          o.active = false;
-          o.el.style.opacity = '0';
-        }
-      }
+        // Drift — 90% forward (z), 10% lateral
+        const drift = Math.sin(c.driftPhase) * c.driftAmp;
 
-      // Spawn from inactive pool
-      const spawnInterval = 180;
-      if (now - lastSpawnRef.current > spawnInterval) {
-        lastSpawnRef.current = now;
-        for (let i = 0; i < pool.length; i++) {
-          if (!pool[i].active) {
-            spawn(pool[i], false);
-            break;
-          }
-        }
-      }
+        // Screen position: project from world center
+        // As z increases, objects appear to expand outward from center
+        const perspFactor = 0.3 + c.z * 0.7; // simulated perspective compression
+        const sx = cx + (c.x0 + drift) * perspFactor - cardPx / 2;
+        const sy = cy + c.y0 * perspFactor - cardPx / 2;
 
-      // Rare gold event
-      if (!goldActiveRef.current && now > nextGoldRef.current) {
-        goldActiveRef.current = true;
-        for (let i = 0; i < pool.length; i++) {
-          if (!pool[i].active) {
-            spawn(pool[i], true);
-            break;
-          }
+        c.el.style.transform = `translate3d(${sx}px,${sy}px,0) scale(${scale}) rotate(${c.tilt * (1 - c.z * 0.6)}deg)`;
+        c.el.style.opacity = String(opacity.toFixed(3));
+        c.el.style.filter = blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : '';
+
+        // Proximity detection for counter reaction
+        if (counter && opacity > 0.6 && scale > 0.65) {
+          const cx2 = sx + cardPx / 2;
+          const cy2 = sy + cardPx / 2;
+          const dx = cx2 - cx;
+          const dy = cy2 - (h() / 2);
+          if (Math.sqrt(dx * dx + dy * dy) < 180) nearCounter = true;
         }
-        nextGoldRef.current = now + 20000 + Math.random() * 10000;
-        setTimeout(() => { goldActiveRef.current = false; }, 3000);
       }
 
       // Counter reaction
-      if (nearCounter) {
-        setGlow(true);
-        if (!shake) {
-          setShake(true);
-          window.clearTimeout(shakeTimeoutRef.current);
-          shakeTimeoutRef.current = window.setTimeout(() => setShake(false), 400);
-        }
-      } else {
-        setGlow(false);
+      if (nearCounter && !shake) {
+        setGlowPulse(true);
+        setShake(true);
+        window.clearTimeout(shakeTO.current);
+        shakeTO.current = window.setTimeout(() => {
+          setShake(false);
+          setGlowPulse(false);
+        }, 420);
       }
 
-      rafRef.current = requestAnimationFrame(loop);
+      rafObjRef.current = requestAnimationFrame(loop);
     };
 
-    rafRef.current = requestAnimationFrame(loop);
+    rafObjRef.current = requestAnimationFrame(loop);
     return () => {
-      cancelAnimationFrame(rafRef.current);
-      window.clearTimeout(shakeTimeoutRef.current);
+      cancelAnimationFrame(rafObjRef.current);
+      window.clearTimeout(shakeTO.current);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
-  // Live counter animation (organic random increments)
+  // ── Counter animation loop ───────────────────────────────────────────────────
+  // Uses a spring-interpolation approach:
+  //  - targetRef advances at COUNTER_RATE /sec (smooth, no spikes)
+  //  - displayRef chases targetRef with a lerp factor → smooth odometer feel
   useEffect(() => {
     if (!visible) return;
-    let raf = 0;
     let last = performance.now();
-    let acc = 0;
-    let nextIncr = 0.06 + Math.random() * 0.12;
 
     const loop = (now: number) => {
-      const dt = (now - last) / 1000;
+      const dt = Math.min((now - last) / 1000, 0.1); // seconds, capped
       last = now;
-      acc += dt;
 
-      if (acc >= nextIncr) {
-        acc = 0;
-        nextIncr = 0.05 + Math.random() * 0.13;
-        const incr = Math.floor(2 + Math.random() * 18);
-        countRef.current += incr;
-        setCount(countRef.current);
+      // Advance target at a steady rate with tiny jitter (±15%)
+      const jitter = 0.85 + Math.random() * 0.30;
+      targetRef.current += COUNTER_RATE * jitter * dt;
+
+      // Lerp display toward target — factor ~4 gives smooth, slightly lagging catch-up
+      const gap = targetRef.current - displayRef.current;
+      displayRef.current += gap * Math.min(1, 4.5 * dt);
+
+      const rounded = Math.floor(displayRef.current);
+      if (rounded !== Math.floor(displayRef.current - gap * Math.min(1, 4.5 * dt))) {
+        setDisplayCount(rounded);
+      } else {
+        setDisplayCount(rounded);
       }
 
-      raf = requestAnimationFrame(loop);
+      rafCntRef.current = requestAnimationFrame(loop);
     };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+
+    rafCntRef.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafCntRef.current);
   }, [visible]);
 
-  const display = count.toLocaleString('en-US');
-  const digits = display.split('');
+  const display = displayCount.toLocaleString('en-US');
 
   return (
     <section
       ref={ref}
       className={`relative min-h-screen overflow-hidden flex items-center justify-center px-6 py-32 imp-section section-reveal ${visible ? 'is-visible' : ''}`}
     >
-      {/* Background layers */}
+      {/* Background */}
       <div className="absolute inset-0 imp-bg-base" />
       <div className="absolute inset-0 imp-bg-radial" />
       <div className="absolute inset-0 imp-bg-vignette" />
       <div className="absolute inset-0 noise pointer-events-none" />
 
-      {/* Floating object field */}
-      <div ref={fieldRef} className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }} />
+      {/* Card field */}
+      <div
+        ref={fieldRef}
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        style={{ zIndex: 1 }}
+      />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto">
+
         {/* Badge */}
         <div className="inline-flex items-center gap-2.5 mb-8 px-4 py-1.5 rounded-full border border-green-500/40 bg-green-500/10 backdrop-blur-sm">
           <span className="w-2 h-2 rounded-full bg-green-400 imp-badge-dot" />
@@ -381,11 +387,7 @@ export function Impressions() {
         </h2>
 
         {/* Counter */}
-        <div
-          ref={counterWrapRef}
-          className="relative mb-6"
-          style={{ perspective: '600px' }}
-        >
+        <div className="relative mb-6">
           <div
             ref={counterRef}
             className={`imp-counter select-none ${shake ? 'imp-shake' : ''}`}
@@ -396,13 +398,13 @@ export function Impressions() {
               lineHeight: 1,
               letterSpacing: '-0.02em',
               color: '#ffffff',
-              textShadow: glow
-                ? '0 0 40px rgba(74,222,128,0.7), 0 0 80px rgba(74,222,128,0.4), 0 4px 12px rgba(0,0,0,0.6)'
+              textShadow: glowPulse
+                ? '0 0 40px rgba(74,222,128,0.75), 0 0 80px rgba(74,222,128,0.4), 0 4px 12px rgba(0,0,0,0.6)'
                 : '0 0 24px rgba(74,222,128,0.35), 0 4px 12px rgba(0,0,0,0.5)',
-              transition: 'text-shadow 0.3s ease',
+              transition: 'text-shadow 0.35s ease',
             }}
           >
-            {digits.map((d, i) => {
+            {display.split('').map((d, i) => {
               const isDigit = d >= '0' && d <= '9';
               return (
                 <span
@@ -410,7 +412,7 @@ export function Impressions() {
                   className="imp-digit"
                   style={{
                     display: 'inline-block',
-                    minWidth: isDigit ? '0.6em' : '0.3em',
+                    minWidth: isDigit ? '0.58em' : '0.28em',
                     textAlign: 'center',
                   }}
                 >
@@ -452,30 +454,8 @@ export function Impressions() {
             Live Internet Activity
           </span>
         </div>
+
       </div>
     </section>
   );
-}
-
-// Helper to produce SVG markup string for pooled objects
-function svgMarkup(type: SvgType): string {
-  const common = 'width="100%" height="100%" style="display:block"';
-  switch (type) {
-    case 'dollarbag':
-      return `<svg viewBox="0 0 100 100" ${common}><ellipse cx="50" cy="55" rx="34" ry="30" fill="#15803d"/><ellipse cx="50" cy="55" rx="28" ry="24" fill="#16a34a"/><ellipse cx="50" cy="50" rx="30" ry="26" fill="#22c55e"/><path d="M 38 25 Q 50 14 62 25" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round"/><text x="50" y="62" text-anchor="middle" font-size="26" font-weight="900" fill="#052e16" font-family="monospace">$</text></svg>`;
-    case 'dollarbill':
-      return `<svg viewBox="0 0 100 60" ${common}><rect x="4" y="8" width="92" height="44" rx="4" fill="#86efac" stroke="#16a34a" stroke-width="2"/><rect x="8" y="12" width="84" height="36" rx="2" fill="#a7f3d0"/><circle cx="50" cy="30" r="13" fill="none" stroke="#15803d" stroke-width="2"/><text x="50" y="36" text-anchor="middle" font-size="16" font-weight="900" fill="#052e16" font-family="monospace">$</text></svg>`;
-    case 'rocket':
-      return `<svg viewBox="0 0 100 100" ${common}><path d="M 50 10 L 68 45 L 68 78 L 32 78 L 32 45 Z" fill="#4ade80" stroke="#16a34a" stroke-width="2"/><circle cx="50" cy="40" r="7" fill="#052e16"/><path d="M 32 70 L 20 90 L 40 78 Z" fill="#16a34a"/><path d="M 68 70 L 80 90 L 60 78 Z" fill="#16a34a"/><path d="M 42 78 Q 50 95 58 78" fill="#fbbf24"/><path d="M 45 80 Q 50 92 55 80" fill="#f59e0b"/></svg>`;
-    case 'candle':
-      return `<svg viewBox="0 0 100 100" ${common}><rect x="38" y="18" width="24" height="64" rx="2" fill="#4ade80" stroke="#16a34a" stroke-width="2"/><rect x="38" y="18" width="24" height="8" fill="#22c55e"/><rect x="38" y="74" width="24" height="8" fill="#15803d"/><line x1="50" y1="6" x2="50" y2="18" stroke="#fbbf24" stroke-width="3"/><path d="M 46 6 Q 50 -2 54 6 Q 50 4 46 6" fill="#fbbf24"/></svg>`;
-    case 'diamond':
-      return `<svg viewBox="0 0 100 100" ${common}><path d="M 50 15 L 82 40 L 50 88 L 18 40 Z" fill="#4ade80" stroke="#16a34a" stroke-width="2"/><path d="M 18 40 L 82 40 L 50 88 Z" fill="#22c55e" opacity="0.6"/><path d="M 50 15 L 18 40 L 50 30 Z" fill="#86efac" opacity="0.5"/><path d="M 50 15 L 82 40 L 50 30 Z" fill="#86efac" opacity="0.3"/></svg>`;
-    case 'coin':
-      return `<svg viewBox="0 0 100 100" ${common}><circle cx="50" cy="50" r="40" fill="#fbbf24" stroke="#d97706" stroke-width="3"/><circle cx="50" cy="50" r="32" fill="#f59e0b"/><text x="50" y="62" text-anchor="middle" font-size="32" font-weight="900" fill="#78350f" font-family="monospace">P</text></svg>`;
-    case 'sticker':
-      return `<svg viewBox="0 0 100 100" ${common}><circle cx="50" cy="50" r="42" fill="#4ade80" stroke="#052e16" stroke-width="3"/><circle cx="50" cy="50" r="42" fill="none" stroke="#fff" stroke-width="2" opacity="0.4" stroke-dasharray="4 4"/><text x="50" y="58" text-anchor="middle" font-size="20" font-weight="900" fill="#052e16" font-family="monospace">PEPE</text></svg>`;
-    case 'sunglasses':
-      return `<svg viewBox="0 0 100 50" ${common}><ellipse cx="28" cy="25" rx="20" ry="16" fill="#052e16"/><ellipse cx="72" cy="25" rx="20" ry="16" fill="#052e16"/><ellipse cx="28" cy="25" rx="20" ry="16" fill="none" stroke="#4ade80" stroke-width="2.5"/><ellipse cx="72" cy="25" rx="20" ry="16" fill="none" stroke="#4ade80" stroke-width="2.5"/><line x1="48" y1="25" x2="52" y2="25" stroke="#4ade80" stroke-width="3"/><ellipse cx="22" cy="20" rx="6" ry="4" fill="#4ade80" opacity="0.4"/><ellipse cx="66" cy="20" rx="6" ry="4" fill="#4ade80" opacity="0.4"/></svg>`;
-  }
 }
