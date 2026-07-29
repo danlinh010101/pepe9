@@ -39,12 +39,6 @@ const VZ_MAX = 0.00190;
 
 const BASE_CARD_PX = 180;
 
-// One card per lane on every device — 8 permanent lanes
-const POOL_DESKTOP = COMPASS_ANGLES.length;
-const POOL_TABLET  = COMPASS_ANGLES.length;
-const POOL_MOBILE  = COMPASS_ANGLES.length;
-
-// 8 compass directions (screen coords: +x right, +y down)
 const COMPASS_ANGLES = [
   -Math.PI / 2,        // N
   -Math.PI / 4,        // NE
@@ -55,6 +49,13 @@ const COMPASS_ANGLES = [
   Math.PI,             // W
   -(3 * Math.PI) / 4,  // NW
 ];
+
+// One card per lane on every device — 8 permanent lanes
+const POOL_DESKTOP = COMPASS_ANGLES.length;
+const POOL_TABLET  = COMPASS_ANGLES.length;
+const POOL_MOBILE  = COMPASS_ANGLES.length;
+
+// 8 compass directions (screen coords: +x right, +y down)
 
 const INCREMENT_TABLE = [
   { value: 15,     weight: 38 },
