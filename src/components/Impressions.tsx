@@ -360,6 +360,16 @@ const perspFactor =
     1 + Math.pow(nz,1.8)*1.5;
         const sx = cx + (c.x0 + drift) * perspFactor - cardPx / 2;
         const sy = cy + c.y0 * perspFactor - cardPx / 2;
+        if (i === 0) {
+  console.log("FRAME", {
+    x0: c.x0,
+    y0: c.y0,
+    z: c.z,
+    sx,
+    sy,
+    active: c.active,
+  });
+}
 c.el.style.transform =
   `translate3d(${sx}px,${sy}px,0)
    scale(${scale})
