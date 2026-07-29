@@ -251,6 +251,7 @@ export function Hero() {
 
       {/* Breathing green glow */}
       <div
+        data-depth="decorative"
         className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full pointer-events-none z-[14]"
         style={{
           background: 'radial-gradient(circle, rgba(74,222,128,0.12) 0%, transparent 70%)',
@@ -259,17 +260,17 @@ export function Hero() {
       />
 
       {/* ───────── Layer 6: Typography & content ───────── */}
-      <div ref={contentRef} className="relative z-20 flex flex-col min-h-screen will-change-transform">
+      <div ref={contentRef} data-depth="content" className="relative z-20 flex flex-col min-h-screen will-change-transform">
         {/* Nav */}
         <nav className="relative z-20 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
           <div className="flex items-center gap-2">
             <span className="text-2xl font-black tracking-tight text-green-400" style={{ fontFamily: '"JetBrains Mono", monospace' }}>$PEPE</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300" style={{ fontFamily: '"Space Grotesk", sans-serif' }}>
-            <a href="#about" className="hover:text-green-400 transition-colors">About</a>
-            <a href="#tokenomics" className="hover:text-green-400 transition-colors">Tokenomics</a>
-            <a href="#roadmap" className="hover:text-green-400 transition-colors">Roadmap</a>
             <a href="#community" className="hover:text-green-400 transition-colors">Community</a>
+            <a href="#tokenomics" className="hover:text-green-400 transition-colors">Tokenomics</a>
+            <a href="#how-to-buy" className="hover:text-green-400 transition-colors">How to Buy</a>
+            <a href="#faq" className="hover:text-green-400 transition-colors">FAQ</a>
           </div>
           <a
             href="#how-to-buy"
@@ -424,6 +425,7 @@ export function Hero() {
 
       {/* Bottom fade */}
       <div
+        data-depth="background"
         className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-[18]"
         style={{ background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.6))' }}
       />

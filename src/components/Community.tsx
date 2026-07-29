@@ -16,13 +16,14 @@ export function Community() {
   const tilt = useTilt<HTMLDivElement>(16);
 
   return (
-    <section id="community" ref={ref} className={`relative py-32 px-6 overflow-hidden mesh-bg noise section-reveal ${visible ? 'is-visible' : ''}`}>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-green-500/10 rounded-full blur-[160px] pointer-events-none" />
+    <section id="community" ref={ref} className={`relative py-20 px-6 overflow-hidden noise section-reveal ${visible ? 'is-visible' : ''}`} style={{ backgroundImage: "linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.72) 50%, rgba(0,0,0,0.88) 100%), url('https://ik.imagekit.io/zznoau6lx/ee5bb410-87fb-426d-acaa-f7fc13ed80b7.png?updatedAt=1784950374011')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-green-600/8 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto text-center">
         {/* Floating pepe */}
-        <div className="flex justify-center mb-8 perspective-1000">
-          <div ref={tilt.ref} onMouseMove={tilt.onMove} onMouseLeave={tilt.onLeave} className="tilt-card relative w-40 h-40">
+        <div className="flex justify-center mb-6 perspective-1000">
+          <div ref={tilt.ref} onMouseMove={tilt.onMove} onMouseLeave={tilt.onLeave} className="tilt-card relative w-28 h-28">
             <div className="absolute inset-0 animate-spin-slow rounded-full" style={{ background: 'conic-gradient(from 0deg, transparent, rgba(74,222,128,0.4), transparent)' }} />
             <img src={PEPE_IMG} alt="Pepe" className="relative w-full h-full object-contain animate-float tilt-inner" style={{ filter: 'drop-shadow(0 0 40px rgba(74,222,128,0.6))', mixBlendMode: 'screen' }} />
           </div>
@@ -30,16 +31,16 @@ export function Community() {
 
         <div className={`reveal ${visible ? 'is-visible' : ''}`}>
           <span className="text-green-400 text-sm font-bold tracking-[0.3em] uppercase">Join the Cult</span>
-          <h2 className="text-6xl md:text-9xl font-black text-white mt-4 tracking-tighter leading-none">
+          <h2 className="text-5xl md:text-7xl font-black text-white mt-3 tracking-tighter leading-none">
             RIBBIT <span className="text-glow-green text-green-400">TOGETHER</span>
           </h2>
-          <p className="text-gray-400 max-w-xl mx-auto mt-6 text-lg">
+          <p className="text-gray-400 max-w-xl mx-auto mt-4 text-base">
             The strongest community in crypto. Hundreds of thousands of frogs, one mission:
             make memecoins great again.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
           {SOCIALS.map((s, i) => (
             <a
               key={s.label}
@@ -60,7 +61,7 @@ export function Community() {
 
         <a
           href="#how-to-buy"
-          className={`group relative inline-flex items-center gap-3 mt-14 px-12 py-5 rounded-full font-black text-black bg-green-400 hover:bg-green-300 text-xl transition-all duration-200 hover:scale-105 shadow-lg shadow-green-500/30 overflow-hidden reveal ${visible ? 'is-visible' : ''}`}
+          className={`group relative inline-flex items-center gap-3 mt-10 px-10 py-4 rounded-full font-black text-black bg-green-400 hover:bg-green-300 text-lg transition-all duration-200 hover:scale-105 shadow-lg shadow-green-500/30 overflow-hidden reveal ${visible ? 'is-visible' : ''}`}
         >
           <span className="relative z-10">Buy $PEPE Now</span>
           <span className="absolute inset-0 aurora opacity-0 group-hover:opacity-100" />
@@ -88,9 +89,9 @@ export function Footer() {
           </div>
 
           <div className="flex items-center gap-6 text-sm text-gray-400">
-            <a href="#about" className="hover:text-green-400 transition-colors">About</a>
+            <a href="#community" className="hover:text-green-400 transition-colors">Community</a>
             <a href="#tokenomics" className="hover:text-green-400 transition-colors">Tokenomics</a>
-            <a href="#roadmap" className="hover:text-green-400 transition-colors">Roadmap</a>
+            <a href="#how-to-buy" className="hover:text-green-400 transition-colors">How to Buy</a>
             <a href="#faq" className="hover:text-green-400 transition-colors">FAQ</a>
           </div>
         </div>

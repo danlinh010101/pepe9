@@ -455,18 +455,19 @@ export function Impressions() {
       className={`relative min-h-screen overflow-hidden flex items-center justify-center px-6 py-32 imp-section section-reveal ${visible ? 'is-visible' : ''}`}
     >
       {/* Background */}
-      <div className="absolute inset-0 imp-bg-base" />
+      <div data-depth="background" className="absolute inset-0 imp-bg-base" />
       <div className="absolute inset-0 noise pointer-events-none" />
 
       {/* Card field */}
       <div
         ref={fieldRef}
+        data-depth="decorative"
         className="absolute inset-0 overflow-hidden pointer-events-none"
         style={{ zIndex: 1 }}
       />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto">
+      <div data-depth="content" className="relative z-10 flex flex-col items-center text-center max-w-5xl mx-auto">
 
         {/* Badge */}
         <div className="inline-flex items-center gap-2.5 mb-8 px-4 py-1.5 rounded-full border border-green-500/40 bg-green-500/10 backdrop-blur-sm">
