@@ -111,8 +111,14 @@ function depthOpacity(z: number): number {
 }
 
 function depthBlur(z: number): number {
-  if (z < 0.30) return (1 - z / 0.30) * 3.0;
-  if (z > 0.78) return ((z - 0.78) / 0.22) * 2.0;
+  if (z < 0.30)
+    return (1 - z / 0.30) * 3;
+
+  const blurStart = Z_NEAR * 0.75;
+
+  if (z > blurStart)
+    return ((z - blurStart) / (Z_NEAR - blurStart)) * 2;
+
   return 0;
 }
 
