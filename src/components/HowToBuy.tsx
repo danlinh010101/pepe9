@@ -1,7 +1,7 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useRef, type ReactNode } from 'react';
 import { Wallet, Coins, ArrowLeftRight, PartyPopper, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useReveal } from '@/hooks/useReveal';
-import Stepper, { Step } from '@/components/Stepper';
+import Stepper, { Step, type StepperRef } from '@/components/Stepper';
 
 const STEPS = [
   { icon: Wallet,         title: 'Get a Wallet',    body: 'Download MetaMask or your favorite self-custody wallet. Fund it with ETH on the Ethereum network.' },
@@ -12,6 +12,7 @@ const STEPS = [
 
 export function HowToBuy() {
   const { ref, visible } = useReveal();
+  const stepperRef = useRef<StepperRef>(null);
   const [currentStep, setCurrentStep] = useState(1);
 
   return (
@@ -77,6 +78,7 @@ export function HowToBuy() {
             />
 
             <Stepper
+              ref={stepperRef}
               initialStep={1}
               onStepChange={setCurrentStep}
               stepCircleContainerClassName="!shadow-none !border-0 !bg-transparent"
@@ -122,7 +124,7 @@ export function HowToBuy() {
           {STEPS.map((_, i) => (
             <button
               key={i}
-              onClick={() => setCurrentStep(i + 1)}
+              onClick={() => stepperRef.current?.goToStep(i + 1)}
               className={`rounded-full transition-all duration-300 ${
                 i + 1 === currentStep ? 'w-6 h-2.5 bg-green-400' : 'w-2.5 h-2.5 bg-white/20'
               }`}

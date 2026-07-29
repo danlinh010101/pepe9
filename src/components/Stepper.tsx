@@ -1,5 +1,11 @@
-import React, { useState, Children, useRef, useLayoutEffect, HTMLAttributes, ReactNode } from 'react';
+import React, { useState, Children, useRef, useLayoutEffect, useImperativeHandle, forwardRef, HTMLAttributes, ReactNode } from 'react';
 import { motion, AnimatePresence, Variants } from 'motion/react';
+
+export interface StepperRef {
+  goToStep: (step: number) => void;
+  next: () => void;
+  back: () => void;
+}
 
 interface StepperProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -22,7 +28,7 @@ interface StepperProps extends HTMLAttributes<HTMLDivElement> {
   }) => ReactNode;
 }
 
-export default function Stepper({
+const Stepper = forwardRef<StepperRef, StepperProps>(function Stepper({
   children,
   initialStep = 1,
   onStepChange = () => {},
@@ -38,7 +44,7 @@ export default function Stepper({
   disableStepIndicators = false,
   renderStepIndicator,
   ...rest
-}: StepperProps) {
+}: StepperProps, ref) {
   const [currentStep, setCurrentStep] = useState<number>(initialStep);
   const [direction, setDirection] = useState<number>(0);
   const stepsArray = Children.toArray(children);
@@ -53,6 +59,12 @@ export default function Stepper({
     } else {
       onStepChange(newStep);
     }
+  };
+
+  const goToStep = (step: number) => {
+    if (step < 1 || step > totalSteps) return;
+    setDirection(step > currentStep ? 1 : -1);
+    updateStep(step);
   };
 
   const handleBack = () => {
@@ -74,9 +86,15 @@ export default function Stepper({
     updateStep(totalSteps + 1);
   };
 
+  useImperativeHandle(ref, () => ({
+    goToStep,
+    next: handleNext,
+    back: handleBack,
+  }));
+
   return (
     <div
-      className="flex min-h-full flex-1 flex-col items-center justify-center p-4 sm:aspect-[4/3] md:aspect-[2/1]"
+      className="flex min-h-full flex-1 flex-col items-center justify-center p-4"
       {...rest}
     >
       <div
@@ -126,20 +144,18 @@ export default function Stepper({
 
         {!isCompleted && (
           <div className={`px-8 pb-8 ${footerClassName}`}>
-            <div className={`mt-10 flex ${currentStep !== 1 ? 'justify-between' : 'justify-end'}`}>
-              {currentStep !== 1 && (
-                <button
-                  onClick={handleBack}
+            <div className={`mt-10 flex justify-between`}>
+              <button
+                onClick={handleBack}
                   className={`duration-350 rounded px-2 py-1 transition ${
                     currentStep === 1
-                      ? 'pointer-events-none opacity-50 text-neutral-400'
+                      ? 'pointer-events-none opacity-40 text-neutral-500'
                       : 'text-neutral-400 hover:text-neutral-700'
                   }`}
                   {...backButtonProps}
                 >
                   {backButtonText}
                 </button>
-              )}
               <button
                 onClick={isLastStep ? handleComplete : handleNext}
                 className="duration-350 flex items-center justify-center rounded-full bg-green-500 py-1.5 px-3.5 font-medium tracking-tight text-white transition hover:bg-green-600 active:bg-green-700"
@@ -153,7 +169,9 @@ export default function Stepper({
       </div>
     </div>
   );
-}
+});
+
+export default Stepper;
 
 interface StepContentWrapperProps {
   isCompleted: boolean;
