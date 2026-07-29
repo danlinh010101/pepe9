@@ -18,7 +18,7 @@ const STATS = [
   { label: 'Liquidity',     value: 8.4,    suffix: 'M',  prefix: '$' },
 ];
 
-const ROTATING_WORDS = ['MATTER', 'DOMINATES', 'WINS', 'PUMPS', 'MOONS', 'PRINTS'];
+const ROTATING_WORDS = ['MATTER','WINS', 'PUMPS', 'MOONS', 'PRINTS'];
 
 function useCountUp(target: number, active: boolean, dur = 1600) {
   const [val, setVal] = useState(0);
