@@ -484,7 +484,7 @@ c.el.style.transform =
             fontFamily: '"Luckiest Guy", cursive',
             fontSize: 'clamp(1rem, 2vw, 1.8rem)',
             letterSpacing: '0.01em',
-            color: '#ffd54a',
+            color: '#fafff4',
             textShadow:
               '0 2px 0 #166534,' +
               '0 4px 0 #14532d,' +
