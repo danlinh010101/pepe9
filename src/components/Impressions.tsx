@@ -331,7 +331,9 @@ const perspFactor =
         const sx = cx + (c.x0 + drift) * perspFactor - cardPx / 2;
         const sy = cy + c.y0 * perspFactor - cardPx / 2;
 
-        c.el.style.transform = `translate3d(${sx}px,${sy}px,0) scale(${scale}) rotate(${c.tilt * (1 - c.z * 0.6)}deg)`;
+        c.el.style.transform = `translate3d(${sx}px,${sy}px,0) scale(${scale}) rotate(${const nz = c.z / Z_NEAR;
+
+c.tilt * (1 - nz * 0.6)}deg)`;
         c.el.style.opacity = String(opacity.toFixed(3));
 
         const filters: string[] = [];
