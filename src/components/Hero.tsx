@@ -4,7 +4,6 @@ import { RevealLayer } from '@/components/RevealLayer';
 import { Particles } from '@/components/Particles';
 
 const BG_IMAGE_1 = 'https://ik.imagekit.io/zznoau6lx/3.png';
-const FOG_IMAGE = 'https://ik.imagekit.io/zznoau6lx/ee5bb410-87fb-426d-acaa-f7fc13ed80b7.png';
 const CONTRACT = '0x6982508145454ce325ddbe47a25d4ec3d2311933';
 
 const STATS = [
@@ -175,14 +174,15 @@ export function Hero() {
         <rect width="100%" height="100%" fill="url(#grid)" />
       </svg>
 
-      {/* ───────── Layer 3: Fog ───────── */}
+      {/* ───────── Layer 3: Fog (CSS-only, no image asset) ───────── */}
       <div
         ref={fogRef}
         className="absolute inset-0 will-change-transform pointer-events-none opacity-40"
         style={{
-          backgroundImage: `url(${FOG_IMAGE})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          background:
+            'radial-gradient(ellipse 60% 40% at 30% 35%, rgba(74,222,128,0.10) 0%, transparent 70%),' +
+            'radial-gradient(ellipse 50% 35% at 75% 55%, rgba(34,197,94,0.08) 0%, transparent 70%),' +
+            'radial-gradient(ellipse 70% 45% at 50% 75%, rgba(132,204,22,0.06) 0%, transparent 70%)',
           mixBlendMode: 'screen',
           animation: 'fogDrift 24s ease-in-out infinite alternate',
         }}
@@ -276,7 +276,7 @@ export function Hero() {
             style={{
               fontFamily: '"Space Grotesk", sans-serif',
               fontWeight: 900,
-              fontSize: 'clamp(0.7rem, 2.2vw, 1.25rem)',
+              fontSize: 'clamp(0.56rem, 1.76vw, 1rem)',
               letterSpacing: '0.35em',
               textTransform: 'uppercase',
               color: '#4ade80',
@@ -292,7 +292,7 @@ export function Hero() {
             style={{
               fontFamily: '"Plus Jakarta Sans", sans-serif',
               fontWeight: 600,
-              fontSize: 'clamp(0.95rem, 1.8vw, 1.2rem)',
+              fontSize: 'clamp(0.76rem, 1.44vw, 0.96rem)',
               lineHeight: 1.7,
               color: '#d1d5db',
             }}
@@ -305,7 +305,7 @@ export function Hero() {
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
             <a
               href="#how-to-buy"
-              className="hero-btn-primary group relative inline-flex items-center gap-2.5 px-8 py-4 rounded-full text-base sm:text-lg transition-all duration-300"
+              className="hero-btn-primary group relative inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm sm:text-base transition-all duration-300"
               style={{
                 fontFamily: '"Space Grotesk", sans-serif',
                 fontWeight: 800,
@@ -315,12 +315,12 @@ export function Hero() {
                 boxShadow: '0 0 24px rgba(74,222,128,0.35), inset 0 1px 0 rgba(255,255,255,0.4)',
               }}
             >
-              <TrendingUp className="w-5 h-5" />
+              <TrendingUp className="w-4 h-4" />
               Buy on Uniswap
             </a>
             <a
               href="#how-to-buy"
-              className="hero-btn-secondary group relative inline-flex items-center gap-2.5 px-8 py-4 rounded-full text-base sm:text-lg transition-all duration-300"
+              className="hero-btn-secondary group relative inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm sm:text-base transition-all duration-300"
               style={{
                 fontFamily: '"Space Grotesk", sans-serif',
                 fontWeight: 800,
@@ -330,14 +330,14 @@ export function Hero() {
                 backdropFilter: 'blur(8px)',
               }}
             >
-              <Zap className="w-5 h-5" />
+              <Zap className="w-4 h-4" />
               How to Buy
             </a>
           </div>
 
           {/* Contract Address — terminal/wallet style */}
           <div
-            className="contract-box group flex items-center gap-3 px-5 py-3.5 rounded-xl mb-12 max-w-md w-full sm:w-auto transition-all duration-300"
+            className="contract-box group flex items-center gap-2 px-4 py-2.5 rounded-xl mb-12 max-w-md w-full sm:w-auto transition-all duration-300"
             style={{
               fontFamily: '"JetBrains Mono", monospace',
               background: 'rgba(5, 46, 22, 0.55)',
@@ -350,22 +350,22 @@ export function Hero() {
               className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-green-400"
               style={{ boxShadow: '0 0 8px rgba(74,222,128,0.8)' }}
             />
-            <span className="text-green-500/70 text-[10px] font-bold uppercase tracking-[0.2em] hidden sm:block">CA</span>
-            <span className="text-gray-300 text-xs sm:text-sm truncate flex-1 sm:flex-none">
+            <span className="text-green-500/70 text-[9px] font-bold uppercase tracking-[0.2em] hidden sm:block">CA</span>
+            <span className="text-gray-300 text-[11px] sm:text-xs truncate flex-1 sm:flex-none">
               {CONTRACT}
             </span>
             <button
               onClick={handleCopy}
-              className="contract-copy flex-shrink-0 relative w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300"
+              className="contract-copy flex-shrink-0 relative w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300"
               style={{
                 background: 'rgba(74,222,128,0.1)',
                 border: '1px solid rgba(74,222,128,0.2)',
               }}
             >
               {copied ? (
-                <Check className="w-4 h-4 text-green-400 animate-[pop_0.3s_ease]" />
+                <Check className="w-3.5 h-3.5 text-green-400 animate-[pop_0.3s_ease]" />
               ) : (
-                <Copy className="w-4 h-4 text-green-400/80 group-hover:text-green-300 transition-colors" />
+                <Copy className="w-3.5 h-3.5 text-green-400/80 group-hover:text-green-300 transition-colors" />
               )}
             </button>
           </div>
@@ -378,7 +378,7 @@ export function Hero() {
                 className="stat-card group flex flex-col items-center gap-1.5 transition-all duration-300"
                 style={{ cursor: 'default' }}
               >
-                <Icon className="w-4 h-4 text-green-500 mb-1 transition-all duration-300 group-hover:scale-125 group-hover:text-green-300" />
+                <Icon className="w-3.5 h-3.5 text-green-500 mb-1 transition-all duration-300 group-hover:scale-125 group-hover:text-green-300" />
                 <span
                   className="stat-value transition-all duration-300 group-hover:text-green-300"
                   style={{
@@ -396,7 +396,7 @@ export function Hero() {
                   style={{
                     fontFamily: '"Plus Jakarta Sans", sans-serif',
                     fontWeight: 500,
-                    fontSize: '0.65rem',
+                    fontSize: '0.52rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.18em',
                     color: '#6b7280',
