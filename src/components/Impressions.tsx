@@ -188,6 +188,15 @@ export function Impressions() {
     card.x  = card.x0;
     card.y  = card.y0;
 
+    console.log("SPAWN", {
+  lane: card.laneIndex,
+  radius,
+  x0: card.x0,
+  y0: card.y0,
+  w,
+  h,
+});
+
     if (spreadZ) {
   // z sẽ được gán bên ngoài khi khởi tạo
 } else {
