@@ -44,18 +44,17 @@ const COMPASS_ANGLES = [
   -Math.PI / 4,        // NE
   0,                   // E
   Math.PI / 4,         // SE
-  Math.PI / 2,         // S
   (3 * Math.PI) / 4,   // SW
   Math.PI,             // W
   -(3 * Math.PI) / 4,  // NW
 ];
 
-// One card per lane on every device — 8 permanent lanes
+// One card per lane on every device — 7 permanent lanes
 const POOL_DESKTOP = COMPASS_ANGLES.length;
 const POOL_TABLET  = COMPASS_ANGLES.length;
 const POOL_MOBILE  = COMPASS_ANGLES.length;
 
-// 8 compass directions (screen coords: +x right, +y down)
+// 7 active compass directions — center-bottom (S) removed (screen coords: +x right, +y down)
 
 const INCREMENT_TABLE = [
   { value: 15,     weight: 38 },
@@ -347,17 +346,26 @@ export function Impressions() {
         // Perspective: preserve spawn radius at z=0, expand outward as z→1
         const nz = c.z / Z_NEAR;
 
-const perspFactor =
-    1 + Math.pow(nz,1.8)*1.1;
+        // Bottom lanes (SE, SW) travel less and fade earlier at the bottom edge
+        const bottomLane = Math.sin(COMPASS_ANGLES[c.laneIndex]) > 0.5;
+        const perspExp = bottomLane ? 0.85 : 1.1;
+        const perspFactor = 1 + Math.pow(nz, 1.8) * perspExp;
         const sx = cx + (c.x0 + drift) * perspFactor - cardPx / 2;
         const sy = cy + c.y0 * perspFactor - cardPx / 2;
 
         // Boundary fade — card completes fade-out before reaching section edges
         const edgeMargin = 220;
-        const minEdgeDist = Math.min(sx, fieldW.current - sx - cardPx, sy, fieldH.current - sy - cardPx);
-        const edgeFade = Math.max(0, Math.min(1, minEdgeDist / edgeMargin));
+        const bottomMargin = bottomLane ? 300 : 220;
+        const distLeft = sx;
+        const distRight = fieldW.current - sx - cardPx;
+        const distTop = sy;
+        const distBottom = fieldH.current - sy - cardPx;
+        const edgeFade = Math.max(0, Math.min(1,
+          Math.min(distLeft / edgeMargin, distRight / edgeMargin, distTop / edgeMargin, distBottom / bottomMargin)
+        ));
 
-        if (edgeFade < 0.02) {
+        const recycleThreshold = bottomLane ? 0.1 : 0.02;
+        if (edgeFade < recycleThreshold) {
           c.el.style.opacity = '0';
           c.active = false;
           spawnCard(c, false);
