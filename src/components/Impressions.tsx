@@ -188,7 +188,11 @@ export function Impressions() {
     card.x  = card.x0;
     card.y  = card.y0;
 
-    card.z  = spreadZ ? Math.random() : Z_FAR + Math.random() * 0.04;
+    if (spreadZ) {
+  // z sẽ được gán bên ngoài khi khởi tạo
+} else {
+  card.z = Z_FAR + Math.random() * 0.04;
+}
     card.vz = VZ_MIN + Math.random() * (VZ_MAX - VZ_MIN);
 
     card.driftAmp   = Math.random() * 10;
