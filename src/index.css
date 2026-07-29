@@ -350,27 +350,38 @@
   }
 
   /* ── Rolling odometer ── */
-  .imp-odo {
-    display: inline-flex;
-    align-items: baseline;
-    overflow: hidden;
-    vertical-align: top;
-  }
-  .imp-odo-slot {
-    display: inline-block;
-    position: relative;
-    overflow: hidden;
-    vertical-align: top;
-  }
-  .imp-odo-reel {
-    display: flex;
-    flex-direction: column;
-    will-change: transform;
-    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .imp-odo-cell {
-    display: block;
-    text-align: center;
-    line-height: 1;
-  }
+  .imp-odo{
+    display:inline-flex;
+    align-items:flex-end;
+}
+
+.imp-odo-slot{
+    position:relative;
+    display:inline-block;
+    overflow:hidden;
+
+    height:1em;
+    line-height:1em;
+
+    vertical-align:bottom;
+}
+
+.imp-odo-reel{
+    display:flex;
+    flex-direction:column;
+
+    will-change:transform;
+}
+
+.imp-odo-cell{
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    height:1em;
+    line-height:1em;
+
+    flex-shrink:0;
+}
 }
