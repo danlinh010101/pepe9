@@ -468,7 +468,7 @@ c.el.style.transform =
 
         {/* Badge */}
         <div className="inline-flex items-center gap-2.5 mb-8 px-4 py-1.5 rounded-full border border-green-500/40 bg-green-500/10 backdrop-blur-sm">
-          <span className="w-2 h-2 rounded-full bg-green-400 imp-badge-dot" />
+          <span className="w-2 h-2 rounded-full bg-red-400 imp-badge-dot" />
           <span
             className="text-green-400 text-[0.65rem] sm:text-xs font-bold tracking-[0.3em] uppercase"
             style={{ fontFamily: '"Space Grotesk", sans-serif' }}
