@@ -224,4 +224,64 @@
   .perspective-1000 {
     perspective: 1000px;
   }
+
+  /* ── Hero ambient animations ── */
+
+  @keyframes fogDrift {
+    0%   { transform: translateX(-2%) scale(1.05); opacity: 0.35; }
+    50%  { opacity: 0.5; }
+    100% { transform: translateX(2%) scale(1.08); opacity: 0.35; }
+  }
+
+  @keyframes waterShimmer {
+    0%   { opacity: 0.6; transform: translateY(0); }
+    100% { opacity: 1;   transform: translateY(-6px); }
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: translateX(-50%) scale(1);    opacity: 0.6; }
+    50%      { transform: translateX(-50%) scale(1.15);  opacity: 1; }
+  }
+
+  @keyframes shimmer {
+    0%   { opacity: 0.5; transform: translateY(0); }
+    100% { opacity: 1;   transform: translateY(-4px); }
+  }
+
+  @keyframes pop {
+    0%   { transform: scale(0.5); opacity: 0; }
+    60%  { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1);   opacity: 1; }
+  }
+
+  /* ── Hero button hovers ── */
+  .hero-btn-primary:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 40px rgba(74,222,128,0.6), 0 8px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.5) !important;
+  }
+  .hero-btn-secondary:hover {
+    transform: translateY(-3px) scale(1.03);
+    background: rgba(74,222,128,0.12) !important;
+    box-shadow: 0 0 32px rgba(74,222,128,0.35) !important;
+  }
+
+  /* ── Contract copy button ── */
+  .contract-copy:hover {
+    background: rgba(74,222,128,0.25) !important;
+    transform: scale(1.1);
+  }
+  .contract-copy:active {
+    transform: scale(0.92);
+  }
+
+  /* ── Stat card hover ── */
+  .stat-card:hover {
+    transform: translateY(-4px);
+  }
+  .stat-value {
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+  }
+  .stat-card:hover .stat-value {
+    text-shadow: 0 0 30px rgba(74,222,128,0.5) !important;
+  }
 }
