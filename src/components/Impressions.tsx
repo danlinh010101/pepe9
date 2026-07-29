@@ -527,7 +527,7 @@ transition: 'text-shadow .35s ease',
             fontSize: 'clamp(0.6rem, 1.6vw, 0.95rem)',
             letterSpacing: '0.35em',
             textTransform: 'uppercase',
-            color: '#ffd54a',
+            color: '#fafff4',
             textShadow: '0 0 18px rgba(74,222,128,0.5)',
           }}
         >
