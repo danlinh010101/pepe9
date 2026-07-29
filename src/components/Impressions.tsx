@@ -39,7 +39,7 @@ const VZ_MAX = 0.00190;
 
 const BASE_CARD_PX = 90;
 
-const POOL_DESKTOP = 15;
+const POOL_DESKTOP = 10;
 const POOL_TABLET  = 8;
 const POOL_MOBILE  = 5;
 
