@@ -393,7 +393,7 @@ c.el.style.transform =
       }
 
       const gap = targetRef.current - displayRef.current;
-      const factor = Math.min(1, (3.2 + Math.min(2, Math.log10(Math.abs(gap)+1)*1.5)) * dt);
+      const factor = Math.min(1, (1.8 + Math.min(1.4, Math.log10(Math.abs(gap)+1))) * dt);
       displayRef.current += gap * factor;
 
       const rounded = Math.floor(displayRef.current);
