@@ -11,7 +11,7 @@ const CARD_IMAGES = [
   'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/loadingBackground%20(1).webp?updatedAt=1785238535218',
   'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/wp11496855.webp?updatedAt=1785236346465',
   'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/wp11501455-lucy-cyberpunk-wallpapers.webp?updatedAt=1785236345822',
-  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/wp14146052-cyberpunk-edgerunners-desktop-wallpapers.webp?updatedAt=1785235625688',
+  'https://ik.imagekit.io/zznoau6lx/Cybercoin%20webp/2/wp14146132-cyberpunk-edgerunners-desktop-wallpapers.webp?updatedAt=1785235621697',
 ];
 
 // Fallback for broken images — Pepe-green gradient square
