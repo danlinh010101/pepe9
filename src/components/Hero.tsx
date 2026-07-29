@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { Copy, TrendingUp, Users, Zap, Check } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { TrendingUp, Users, Zap } from 'lucide-react';
 import { RevealLayer } from '@/components/RevealLayer';
 import { Particles } from '@/components/Particles';
 
 const BG_IMAGE_1 = 'https://ik.imagekit.io/zznoau6lx/3.png';
-const CONTRACT = '0x6982508145454ce325ddbe47a25d4ec3d2311933';
+
+const LETTERS = ['P', 'E', 'P', 'E'];
 
 const STATS = [
   { label: 'Market Cap',  value: '$1.2B',   icon: TrendingUp },
@@ -24,14 +25,16 @@ export function Hero() {
   const waterRef = useRef<HTMLDivElement>(null);
   const pepeRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const letterStateRef = useRef(
+    LETTERS.map(() => ({ sx: 1, sy: 1, tx: 0, ty: 0, glow: 0 }))
+  );
 
   const mouseRef = useRef({ x: 0, y: 0 });
   const smoothRef = useRef({ x: 0, y: 0 });
   const gridOffsetRef = useRef({ x: 0, y: 0 });
   const rafRef = useRef<number>(0);
   const tickingRef = useRef(false);
-
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const w = window.innerWidth;
@@ -93,9 +96,51 @@ export function Hero() {
       if (waterRef.current) waterRef.current.style.translate = `0 ${(scrollProgress * 130).toFixed(1)}px`;
       if (pepeRef.current) pepeRef.current.style.translate = `0 ${(scrollProgress * 60).toFixed(1)}px`;
 
+      // ───────── Text Pressure on PEPE letters ─────────
+      let lettersSettled = true;
+      const h1Rect = pepeRef.current?.getBoundingClientRect();
+      if (h1Rect) {
+        const lRefs = letterRefs.current;
+        const lState = letterStateRef.current;
+        for (let i = 0; i < lRefs.length; i++) {
+          const el = lRefs[i];
+          if (!el) continue;
+          const lx = h1Rect.left + el.offsetLeft + el.offsetWidth / 2;
+          const ly = h1Rect.top + el.offsetTop + el.offsetHeight / 2;
+          const ddx = smoothRef.current.x - lx;
+          const ddy = smoothRef.current.y - ly;
+          const dist = Math.sqrt(ddx * ddx + ddy * ddy);
+          const maxDist = 300;
+          const force = Math.max(0, 1 - dist / maxDist);
+          const pushDir = dist > 0.5 ? ddx / dist : 0;
+
+          const s = lState[i];
+          s.sx += ((1 + force * 0.18) - s.sx) * 0.15;
+          s.sy += ((1 - force * 0.10) - s.sy) * 0.15;
+          s.tx += ((pushDir * force * 5) - s.tx) * 0.15;
+          s.ty += ((-force * 7) - s.ty) * 0.15;
+          s.glow += (force - s.glow) * 0.15;
+
+          el.style.transform =
+            `translate3d(${s.tx.toFixed(2)}px, ${s.ty.toFixed(2)}px, 0) scaleX(${s.sx.toFixed(3)}) scaleY(${s.sy.toFixed(3)})`;
+
+          if (s.glow > 0.01) {
+            el.style.filter =
+              `drop-shadow(0 0 ${(20 + s.glow * 30).toFixed(0)}px rgba(74,222,128,${(0.45 + s.glow * 0.4).toFixed(2)}))` +
+              ` drop-shadow(0 ${(4 + s.glow * 4).toFixed(0)}px ${(8 + s.glow * 8).toFixed(0)}px rgba(0,0,0,0.6))`;
+          } else if (el.style.filter) {
+            el.style.filter = '';
+          }
+
+          if (Math.abs(s.sx - 1) > 0.01 || Math.abs(s.sy - 1) > 0.01 || Math.abs(s.tx) > 0.05 || Math.abs(s.ty) > 0.05 || s.glow > 0.01) {
+            lettersSettled = false;
+          }
+        }
+      }
+
       const dx = Math.abs(mouseRef.current.x - smoothRef.current.x);
       const dy = Math.abs(mouseRef.current.y - smoothRef.current.y);
-      if (dx > 0.5 || dy > 0.5 || scrollProgress > 0) {
+      if (dx > 0.5 || dy > 0.5 || scrollProgress > 0 || !lettersSettled) {
         rafRef.current = requestAnimationFrame(loop);
       } else {
         tickingRef.current = false;
@@ -115,12 +160,6 @@ export function Hero() {
       cancelAnimationFrame(rafRef.current);
     };
   }, []);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(CONTRACT);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <section
@@ -267,7 +306,15 @@ export function Hero() {
                 '0 0 80px rgba(74,222,128,0.2)',
             }}
           >
-            PEPE
+            {LETTERS.map((ch, i) => (
+              <span
+                key={i}
+                ref={(el) => { letterRefs.current[i] = el; }}
+                className="inline-block will-change-transform"
+              >
+                {ch}
+              </span>
+            ))}
           </h1>
 
           {/* Subtitle — Space Grotesk 900, uppercase, wide tracking, neon green */}
@@ -333,41 +380,6 @@ export function Hero() {
               <Zap className="w-4 h-4" />
               How to Buy
             </a>
-          </div>
-
-          {/* Contract Address — terminal/wallet style */}
-          <div
-            className="contract-box group flex items-center gap-2 px-4 py-2.5 rounded-xl mb-12 max-w-md w-full sm:w-auto transition-all duration-300"
-            style={{
-              fontFamily: '"JetBrains Mono", monospace',
-              background: 'rgba(5, 46, 22, 0.55)',
-              border: '1px solid rgba(74,222,128,0.25)',
-              boxShadow: '0 0 0 1px rgba(74,222,128,0.08), 0 8px 24px rgba(0,0,0,0.4)',
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-            <span
-              className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-green-400"
-              style={{ boxShadow: '0 0 8px rgba(74,222,128,0.8)' }}
-            />
-            <span className="text-green-500/70 text-[9px] font-bold uppercase tracking-[0.2em] hidden sm:block">CA</span>
-            <span className="text-gray-300 text-[11px] sm:text-xs truncate flex-1 sm:flex-none">
-              {CONTRACT}
-            </span>
-            <button
-              onClick={handleCopy}
-              className="contract-copy flex-shrink-0 relative w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300"
-              style={{
-                background: 'rgba(74,222,128,0.1)',
-                border: '1px solid rgba(74,222,128,0.2)',
-              }}
-            >
-              {copied ? (
-                <Check className="w-3.5 h-3.5 text-green-400 animate-[pop_0.3s_ease]" />
-              ) : (
-                <Copy className="w-3.5 h-3.5 text-green-400/80 group-hover:text-green-300 transition-colors" />
-              )}
-            </button>
           </div>
 
           {/* Stats — bigger numbers, smaller labels, hover lift */}
