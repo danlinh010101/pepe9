@@ -102,8 +102,8 @@ type Card = {
 // ─── Depth curves ─────────────────────────────────────────────────────────────
 function depthOpacity(z: number): number {
   if (z < 0.15) return z / 0.15;
-  if (z < 0.75) return 1.0;
-  return Math.max(0, (1.0 - z) / 0.25);
+  if (z < 0.60) return 1.0;
+  return Math.max(0, (1.0 - z) / 0.40);
 }
 
 function depthBlur(z: number): number {
