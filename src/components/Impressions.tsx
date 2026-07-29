@@ -173,7 +173,7 @@ export function Impressions() {
     const h = fieldH.current;
 
     const minR = Math.min(w, h) * 0.26;
-    const maxR = Math.min(w, h) * 0.52;
+    const maxR = Math.min(w, h) * 0.45;
 
     // Fixed lane angle with very small jitter (±7°) — never enough to cross lanes
     const baseAngle = COMPASS_ANGLES[card.laneIndex];
@@ -187,15 +187,6 @@ export function Impressions() {
     card.y0 = Math.sin(angle) * radius;
     card.x  = card.x0;
     card.y  = card.y0;
-
-    console.log("SPAWN", {
-  lane: card.laneIndex,
-  radius,
-  x0: card.x0,
-  y0: card.y0,
-  w,
-  h,
-});
 
     if (spreadZ) {
   // z sẽ được gán bên ngoài khi khởi tạo
@@ -357,31 +348,36 @@ export function Impressions() {
         const nz = c.z / Z_NEAR;
 
 const perspFactor =
-    1 + Math.pow(nz,1.8)*1.5;
+    1 + Math.pow(nz,1.8)*1.1;
         const sx = cx + (c.x0 + drift) * perspFactor - cardPx / 2;
         const sy = cy + c.y0 * perspFactor - cardPx / 2;
-        if (i === 0) {
-  console.log("FRAME", {
-    x0: c.x0,
-    y0: c.y0,
-    z: c.z,
-    sx,
-    sy,
-    active: c.active,
-  });
-}
-c.el.style.transform =
-  `translate3d(${sx}px,${sy}px,0)
-   scale(${scale})
-   rotate(${c.tilt * (1 - nz * 0.6)}deg)`;
-        c.el.style.opacity = String(opacity.toFixed(3));
+
+        // Boundary fade — card completes fade-out before reaching section edges
+        const edgeMargin = 220;
+        const minEdgeDist = Math.min(sx, fieldW.current - sx - cardPx, sy, fieldH.current - sy - cardPx);
+        const edgeFade = Math.max(0, Math.min(1, minEdgeDist / edgeMargin));
+
+        if (edgeFade < 0.02) {
+          c.el.style.opacity = '0';
+          c.active = false;
+          spawnCard(c, false);
+          continue;
+        }
+
+        const finalOpacity = opacity * edgeFade;
+
+        c.el.style.transform =
+          `translate3d(${sx}px,${sy}px,0)
+           scale(${scale})
+           rotate(${c.tilt * (1 - nz * 0.6)}deg)`;
+        c.el.style.opacity = String(finalOpacity.toFixed(3));
 
         const filters: string[] = [];
         if (blur > 0.05) filters.push(`blur(${blur.toFixed(2)}px)`);
         if (Math.abs(bright - 1) > 0.005) filters.push(`brightness(${bright.toFixed(3)})`);
         c.el.style.filter = filters.join(' ');
 
-        if (counter && opacity > 0.6 && scale > 0.65) {
+        if (counter && finalOpacity > 0.6 && scale > 0.65) {
           const dx = sx + cardPx / 2 - cx;
           const dy = sy + cardPx / 2 - cy;
           if (Math.sqrt(dx * dx + dy * dy) < 180) nearCounter = true;
@@ -501,7 +497,7 @@ c.el.style.transform =
             style={{
               fontFamily: '"Space Grotesk", sans-serif',
               fontWeight: 700,
-              fontSize: 'clamp(2.8rem, 9vw, 7rem)',
+              fontSize: 'clamp(3.64rem, 11.7vw, 9.1rem)',
               lineHeight: 1,
               letterSpacing: '-0.02em',
               color: '#ffd54a',

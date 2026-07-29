@@ -98,7 +98,6 @@ export function GlobalFollowers() {
               fontWeight: 700,
               fontSize: 'clamp(1.5rem, 4vw, 3rem)',
               letterSpacing: '0.05em',
-              textShadow: '0 0 24px rgba(86,242,123,0.5)',
             }}
           >
             5,000,000+
