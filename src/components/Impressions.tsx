@@ -103,7 +103,7 @@ type Card = {
 function depthOpacity(z: number): number {
   const fadeStart = Z_NEAR * 0.65;
 
-  if (z < 0.15) return z / 0.15;
+  if (z < 0.15) return z / 0.22;
 
   if (z < fadeStart) return 1;
 
