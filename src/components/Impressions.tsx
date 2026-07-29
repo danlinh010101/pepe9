@@ -525,78 +525,49 @@ c.el.style.transform =
 function Odometer({ digits }: { digits: string[] }) {
   return (
     <span className="imp-odo">
-      {digits.map((d, i) => {
-        const isDigit = d >= '0' && d <= '9';
-        if (!isDigit) {
+      {digits.map((char, i) => {
+        if (!/\d/.test(char)) {
           return (
             <span
               key={i}
               className="imp-odo-slot"
-              style={{ width: '0.28em', textAlign: 'center' }}
+              style={{
+                width: "0.3em",
+                overflow: "visible",
+              }}
             >
-              {d}
+              {char}
             </span>
           );
         }
-        return <OdometerSlot key={i} digit={d} />;
+
+        return (
+          <DigitWheel
+            key={i}
+            digit={Number(char)}
+          />
+        );
       })}
     </span>
   );
 }
 
-function OdometerSlot({ digit }: { digit: string }) {
-  const reelRef = useRef<HTMLSpanElement>(null);
-  const posRef  = useRef(parseInt(digit, 10));
-  const prevRef = useRef(digit);
-
-  useEffect(() => {
-    const reel = reelRef.current;
-    if (!reel) return;
-
-    const oldVal = parseInt(prevRef.current, 10);
-    const newVal = parseInt(digit, 10);
-    prevRef.current = digit;
-    const delta = (newVal - oldVal + 10) % 10;
-    if (delta === 0) return;
-
-    posRef.current += delta;
-    reel.style.transition = 'transform 0.75s cubic-bezier(.22,1,.36,1) cubic-bezier(0.22, 1, 0.36, 1)';
-    reel.style.transform =
-    `translate3d(0,-${posRef.current * 100}%,0)`;
-
-    // After transition, snap back to modulo position if wrapped past 9
-    if (posRef.current >= 10) {
-      const snapPos = posRef.current % 10;
-      const t = window.setTimeout(() => {
-        reel.style.transition = 'none';
-        reel.style.transform =
-    `translate3d(0,-${snapPos * 100}%,0)`;
-        posRef.current = snapPos;
-        void reel.offsetHeight;
-        reel.style.transition = '';
-      }, 600);
-      return () => window.clearTimeout(t);
-    }
-  }, [digit]);
-
-  // Reel: 0–9 duplicated so wrap-around scrolls forward past 9 into the second copy
-  const reel = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
+function DigitWheel({ digit }: { digit: number }) {
   return (
-    <span
-      className="imp-odo-slot"
-      style={{ width: '0.58em', height: '1em', textAlign: 'center' }}
-    >
+    <span className="imp-odo-slot">
       <span
-        ref={reelRef}
         className="imp-odo-reel"
         style={{
-    transform:`translate3d(0,-${posRef.current * 100}%,0)`
-}}
+          transform: `translateY(-${digit}em)`
+        }}
       >
-        {reel.map((v, j) => (
-          <span key={j} className="imp-odo-cell" style={{ height: '1em' }}>
-            {v}
+        {[0,1,2,3,4,5,6,7,8,9].map(n=>(
+          <span
+            key={n}
+            className="imp-odo-cell"
+            style={{height:"1em"}}
+          >
+            {n}
           </span>
         ))}
       </span>
