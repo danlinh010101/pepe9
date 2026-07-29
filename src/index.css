@@ -357,30 +357,32 @@
 
 .imp-odo-slot{
     position:relative;
-    display:inline-block;
     overflow:hidden;
 
+    width:.62em;
     height:1em;
-    line-height:1em;
 
-    vertical-align:bottom;
+    display:inline-block;
 }
 
 .imp-odo-reel{
+
     display:flex;
     flex-direction:column;
+
+    transition:transform .65s cubic-bezier(.22,1,.36,1);
 
     will-change:transform;
 }
 
 .imp-odo-cell{
+
     display:flex;
 
     align-items:center;
     justify-content:center;
 
     height:1em;
-    line-height:1em;
 
     flex-shrink:0;
 }
