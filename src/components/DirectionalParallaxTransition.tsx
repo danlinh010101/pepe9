@@ -140,6 +140,3 @@ export function DirectionalParallaxTransition({ children }: DirectionalParallaxT
     </div>
   );
 }
-
-
-export { DirectionalParallaxTransition }
