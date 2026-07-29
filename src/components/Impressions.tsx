@@ -37,7 +37,7 @@ const Z_NEAR = 1.0;
 const VZ_MIN = 0.00130;
 const VZ_MAX = 0.00190;
 
-const BASE_CARD_PX = 200;
+const BASE_CARD_PX = 180;
 
 const POOL_DESKTOP = 25;
 const POOL_TABLET  = 8;
