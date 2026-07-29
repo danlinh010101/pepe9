@@ -88,13 +88,8 @@ export function Hero() {
       apply(pepeRef.current, cx, cy, 34);
       apply(contentRef.current, cx, cy, 6);
 
-      // Scroll parallax — each layer drifts at its own rate
-      if (skyRef.current) skyRef.current.style.translate = `0 ${(scrollProgress * 40).toFixed(1)}px`;
-      if (cityRef.current) cityRef.current.style.translate = `0 ${(scrollProgress * 90).toFixed(1)}px`;
-      if (fogRef.current) fogRef.current.style.translate = `0 ${(scrollProgress * -30).toFixed(1)}px`;
-      if (waterRef.current) fogRef.current && (fogRef.current.style.translate = `0 ${(scrollProgress * -30).toFixed(1)}px`);
-      if (waterRef.current) waterRef.current.style.translate = `0 ${(scrollProgress * 130).toFixed(1)}px`;
-      if (pepeRef.current) pepeRef.current.style.translate = `0 ${(scrollProgress * 60).toFixed(1)}px`;
+      // Scroll-driven recede/rise is handled by DirectionalParallaxTransition
+      // (which owns style.translate / scale / opacity for tagged layers).
 
       // ───────── Text Pressure on PEPE letters ─────────
       let lettersSettled = true;
@@ -169,6 +164,7 @@ export function Hero() {
       {/* ───────── Layer 1: Sky (base background) ───────── */}
       <div
         ref={skyRef}
+        data-depth="background"
         className="absolute inset-0 will-change-transform"
         style={{
           backgroundImage: `url(${BG_IMAGE_1})`,
@@ -181,6 +177,7 @@ export function Hero() {
       {/* ───────── Layer 2: Destroyed city (subtle overlay tint) ───────── */}
       <div
         ref={cityRef}
+        data-depth="background"
         className="absolute inset-0 will-change-transform pointer-events-none"
         style={{
           background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0.6) 100%)',
@@ -216,6 +213,7 @@ export function Hero() {
       {/* ───────── Layer 3: Fog (CSS-only, no image asset) ───────── */}
       <div
         ref={fogRef}
+        data-depth="decorative"
         className="absolute inset-0 will-change-transform pointer-events-none opacity-40"
         style={{
           background:
@@ -230,6 +228,7 @@ export function Hero() {
       {/* ───────── Layer 4: Water (shimmer gradient) ───────── */}
       <div
         ref={waterRef}
+        data-depth="decorative"
         className="absolute bottom-0 left-0 right-0 h-1/3 will-change-transform pointer-events-none"
         style={{
           background: 'linear-gradient(180deg, transparent 0%, rgba(74,222,128,0.04) 40%, rgba(34,197,94,0.08) 100%)',
@@ -238,10 +237,14 @@ export function Hero() {
       />
 
       {/* ───────── Layer 5: Poor Pepe (reveal spotlight) ───────── */}
-      <RevealLayer ref={revealRef} />
+      <div data-depth="decorative" className="absolute inset-0">
+        <RevealLayer ref={revealRef} />
+      </div>
 
       {/* ───────── Layer 7: Floating particles ───────── */}
-      <Particles className="absolute inset-0 pointer-events-none z-[15]" />
+      <div data-depth="decorative" className="absolute inset-0 pointer-events-none z-[15]">
+        <Particles className="absolute inset-0 pointer-events-none" />
+      </div>
 
       {/* Dark overlay for text readability */}
       <div
@@ -252,7 +255,7 @@ export function Hero() {
       {/* Breathing green glow */}
       <div
         data-depth="decorative"
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full pointer-events-none z-[14]"
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full pointer-events-none z-[14] will-change-transform"
         style={{
           background: 'radial-gradient(circle, rgba(74,222,128,0.12) 0%, transparent 70%)',
           animation: 'breathe 7s ease-in-out infinite',
@@ -260,7 +263,7 @@ export function Hero() {
       />
 
       {/* ───────── Layer 6: Typography & content ───────── */}
-      <div ref={contentRef} data-depth="content" className="relative z-20 flex flex-col min-h-screen will-change-transform">
+      <div ref={contentRef} data-depth="content" className="relative z-20 flex flex-col min-h-screen will-change-transform" style={{ willChange: 'translate, scale, opacity' }}>
         {/* Nav */}
         <nav className="relative z-20 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
           <div className="flex items-center gap-2">
@@ -426,7 +429,7 @@ export function Hero() {
       {/* Bottom fade */}
       <div
         data-depth="background"
-        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-[18]"
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-[18] will-change-transform"
         style={{ background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.6))' }}
       />
     </section>
