@@ -560,7 +560,7 @@ function OdometerSlot({ digit }: { digit: string }) {
     if (delta === 0) return;
 
     posRef.current += delta;
-    reel.style.transition = 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)';
+    reel.style.transition = 'transform 0.75s cubic-bezier(.22,1,.36,1) cubic-bezier(0.22, 1, 0.36, 1)';
     reel.style.transform =
     `translate3d(0,-${posRef.current * 100}%,0)`;
 
