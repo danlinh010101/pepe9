@@ -482,7 +482,7 @@ c.el.style.transform =
           className="mb-10 leading-[0.95]"
           style={{
             fontFamily: '"Luckiest Guy", cursive',
-            fontSize: 'clamp(1.5rem, 3vw, 2.8rem)',
+            fontSize: 'clamp(1rem, 2vw, 1.8rem)',
             letterSpacing: '0.01em',
             color: '#fafff4',
             textShadow:
