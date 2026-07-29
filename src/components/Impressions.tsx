@@ -126,11 +126,15 @@ function depthScale(z: number): number {
   return 0.28 + Math.pow(z, 1.55) * 1.18;
 }
 
-function depthBrightness(z: number): number {
-  if (z < 0.30) return 0.87 + (z / 0.30) * 0.13;
-  if (z < 0.78) return 1.0;
-  return 1.0 + Math.min(1, (z - 0.78) / 0.22) * 0.08;
-}
+const brightStart = Z_NEAR * 0.75;
+
+if (z < brightStart)
+    return 1;
+
+return 1 + Math.min(1,
+    (z - brightStart) /
+    (Z_NEAR - brightStart)
+) * 0.08;
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function Impressions() {
