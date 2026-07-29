@@ -473,8 +473,15 @@ c.el.style.transform =
               letterSpacing: '-0.02em',
               color: '#ffffff',
               textShadow: glowPulse
-                ? '0 0 40px rgba(74,222,128,0.75), 0 0 80px rgba(74,222,128,0.4), 0 4px 12px rgba(0,0,0,0.6)'
-                : '0 0 24px rgba(74,222,128,0.35), 0 4px 12px rgba(0,0,0,0.5)',
+? `
+0 0 16px rgba(74,222,128,.28),
+0 0 28px rgba(74,222,128,.12),
+0 3px 10px rgba(0,0,0,.55)
+`
+: `
+0 0 10px rgba(74,222,128,.12),
+0 3px 10px rgba(0,0,0,.45)
+`
               transition: 'text-shadow 0.35s ease',
             }}
           >
