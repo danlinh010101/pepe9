@@ -72,23 +72,6 @@
     transform: translateY(0) scale(1);
   }
 
-  .marquee-track {
-    display: inline-flex;
-    white-space: nowrap;
-    animation: marquee 30s linear infinite;
-  }
-  .marquee-track.reverse {
-    animation-direction: reverse;
-  }
-  .marquee-track.fast {
-    animation-duration: 18s;
-  }
-
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-  }
-
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }

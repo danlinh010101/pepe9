@@ -1,7 +1,6 @@
 import { CursorGlow } from '@/components/CursorGlow';
 import { Hero } from '@/components/Hero';
 import { Impressions } from '@/components/Impressions';
-import { Ticker } from '@/components/Ticker';
 import { About } from '@/components/About';
 import { Tokenomics } from '@/components/Tokenomics';
 import { HowToBuy } from '@/components/HowToBuy';
@@ -16,7 +15,6 @@ function App() {
       <CursorGlow />
       <Hero />
       <Impressions />
-      <Ticker />
       <About />
       <Tokenomics />
       <HowToBuy />
