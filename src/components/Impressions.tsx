@@ -31,16 +31,16 @@ const FALLBACK_IMG =
 // ─── Constants ───────────────────────────────────────────────────────────────
 const START_COUNT = 779_711_289;
 
-const Z_FAR = 0.01;
+const Z_FAR = 0.0;
 const Z_NEAR = 1.0;
 
-const VZ_MIN = 0.00130;
-const VZ_MAX = 0.00190;
+const VZ_MIN = 0.00115;
+const VZ_MAX = 0.00165;
 
-const BASE_CARD_PX = 180;
+const BASE_CARD_PX = 90;
 
-const POOL_DESKTOP = 25;
-const POOL_TABLET  = 8;
+const POOL_DESKTOP = 8;
+const POOL_TABLET  = 6;
 const POOL_MOBILE  = 5;
 
 // 8 compass directions (screen coords: +x right, +y down)
@@ -150,10 +150,10 @@ export function Impressions() {
     const w = fieldW.current;
     const h = fieldH.current;
 
-    const minR = Math.min(w, h) * 0.20;
-    const maxR = Math.min(w, h) * 0.70;
+    const minR = Math.min(w, h) * 0.26;
+    const maxR = Math.min(w, h) * 0.52;
 
-    // Random compass direction with small angular jitter (±20°)
+    // Random compass direction with small angular jitter (±15°)
     const dirIdx = Math.floor(Math.random() * COMPASS_ANGLES.length);
     const baseAngle = COMPASS_ANGLES[dirIdx];
     const jitter = (Math.random() - 0.5) * (Math.PI / 6);
