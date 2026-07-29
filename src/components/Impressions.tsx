@@ -561,7 +561,8 @@ function OdometerSlot({ digit }: { digit: string }) {
 
     posRef.current += delta;
     reel.style.transition = 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)';
-    reel.style.transform = `translateY(-${posRef.current * 100}%)`;
+    reel.style.transform =
+    `translate3d(0,-${posRef.current * 100}%,0)`;
 
     // After transition, snap back to modulo position if wrapped past 9
     if (posRef.current >= 10) {
