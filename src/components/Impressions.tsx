@@ -153,7 +153,7 @@ export function Impressions() {
     const minR = Math.min(w, h) * 0.20;
     const maxR = Math.min(w, h) * 0.70;
 
-    // Random compass direction with small angular jitter (±15°)
+    // Random compass direction with small angular jitter (±20°)
     const dirIdx = Math.floor(Math.random() * COMPASS_ANGLES.length);
     const baseAngle = COMPASS_ANGLES[dirIdx];
     const jitter = (Math.random() - 0.5) * (Math.PI / 6);
