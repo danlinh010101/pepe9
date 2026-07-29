@@ -324,7 +324,10 @@ export function Impressions() {
         const drift = Math.sin(c.driftPhase) * c.driftAmp;
 
         // Perspective: preserve spawn radius at z=0, expand outward as z→1
-        const perspFactor = 1.0 + Math.pow(c.z, 1.8) * 1.5;
+        const nz = c.z / Z_NEAR;
+
+const perspFactor =
+    1 + Math.pow(nz,1.8)*1.5;
         const sx = cx + (c.x0 + drift) * perspFactor - cardPx / 2;
         const sy = cy + c.y0 * perspFactor - cardPx / 2;
 
