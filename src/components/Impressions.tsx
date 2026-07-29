@@ -123,11 +123,9 @@ function depthBlur(z: number): number {
 }
 
 function depthScale(z: number): number {
-  function depthScale(z:number){
-
-    const nz = z / Z_NEAR;
-
-    return 0.28 + Math.pow(nz,1.55)*1.18;
+  function depthScale(z: number): number {
+  const nz = z / Z_NEAR;
+  return 0.28 + Math.pow(nz, 1.55) * 1.18;
 }
 
 const brightStart = Z_NEAR * 0.75;
