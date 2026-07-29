@@ -39,8 +39,8 @@ const VZ_MAX = 0.00165;
 
 const BASE_CARD_PX = 90;
 
-const POOL_DESKTOP = 8;
-const POOL_TABLET  = 6;
+const POOL_DESKTOP = 15;
+const POOL_TABLET  = 8;
 const POOL_MOBILE  = 5;
 
 // 8 compass directions (screen coords: +x right, +y down)
