@@ -150,8 +150,8 @@ export function Impressions() {
     const w = fieldW.current;
     const h = fieldH.current;
 
-    const minR = Math.min(w, h) * 0.26;
-    const maxR = Math.min(w, h) * 0.52;
+    const minR = Math.min(w, h) * 0.30;
+    const maxR = Math.min(w, h) * 0.70;
 
     // Random compass direction with small angular jitter (±15°)
     const dirIdx = Math.floor(Math.random() * COMPASS_ANGLES.length);
