@@ -569,7 +569,8 @@ function OdometerSlot({ digit }: { digit: string }) {
       const snapPos = posRef.current % 10;
       const t = window.setTimeout(() => {
         reel.style.transition = 'none';
-        reel.style.transform = `translateY(-${snapPos * 100}%)`;
+        reel.style.transform =
+    `translate3d(0,-${snapPos * 100}%,0)`;
         posRef.current = snapPos;
         void reel.offsetHeight;
         reel.style.transition = '';
