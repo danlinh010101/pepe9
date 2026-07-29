@@ -136,16 +136,15 @@ export function Tokenomics() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* 3D tilt donut with ambient rotation + glow pulse */}
+          {/* 3D tilt donut — stationary, glow pulse only */}
           <div className="flex justify-center perspective-1000">
             <div
               ref={tilt.ref}
               onMouseMove={tilt.onMove}
               onMouseLeave={tilt.onLeave}
               className="relative w-72 h-72"
-              style={{ animation: 'tokenSpin 80s linear infinite' }}
             >
-              {/* Outer glow pulse */}
+              {/* Outer glow pulse — lighting only, no rotation */}
               <div
                 className="absolute inset-0 rounded-full pointer-events-none"
                 style={{ animation: 'tokenGlowPulse 4s ease-in-out infinite' }}
@@ -202,10 +201,6 @@ export function Tokenomics() {
       </div>
 
       <style>{`
-        @keyframes tokenSpin {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
-        }
         @keyframes tokenGlowPulse {
           0%, 100% { box-shadow: 0 0 40px rgba(74,222,128,0.15), 0 0 80px rgba(74,222,128,0.06); }
           50%      { box-shadow: 0 0 70px rgba(74,222,128,0.3),  0 0 130px rgba(74,222,128,0.12); }
