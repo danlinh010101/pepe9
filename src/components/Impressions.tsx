@@ -536,7 +536,7 @@ transition: 'text-shadow .35s ease',
 
         {/* Status */}
         <div className="inline-flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-red-400 imp-badge-dot" />
+          <span className="w-2 h-2 rounded-full bg-red-300 imp-badge-dot" />
           <span
             className="text-gray-400"
             style={{
