@@ -280,10 +280,22 @@ export function Impressions() {
     );
 
     Promise.all(preload).then(() => {
-      if (cancelled) return;
-      for (let i = 0; i < n; i++) spawnCard(pool[i], true);
-      setImagesReady(true);
-    });
+  if (cancelled) return;
+
+  // Chia đều 8 lane theo chiều sâu
+  const startZ = Z_FAR;
+  const endZ = Z_NEAR * 0.82;
+
+  for (let i = 0; i < n; i++) {
+    spawnCard(pool[i], false);
+
+    pool[i].z =
+      startZ +
+      (i / (n - 1)) * (endZ - startZ);
+  }
+
+  setImagesReady(true);
+});
 
     return () => {
       cancelled = true;
