@@ -39,9 +39,10 @@ const VZ_MAX = 0.00190;
 
 const BASE_CARD_PX = 180;
 
-const POOL_DESKTOP = 15;
-const POOL_TABLET  = 8;
-const POOL_MOBILE  = 5;
+// One card per lane on every device — 8 permanent lanes
+const POOL_DESKTOP = COMPASS_ANGLES.length;
+const POOL_TABLET  = COMPASS_ANGLES.length;
+const POOL_MOBILE  = COMPASS_ANGLES.length;
 
 // 8 compass directions (screen coords: +x right, +y down)
 const COMPASS_ANGLES = [
@@ -65,10 +66,8 @@ const INCREMENT_TABLE = [
 const INCREMENT_INTERVAL_MS = 1400;
 
 function poolSize() {
-  const w = typeof window !== 'undefined' ? window.innerWidth : 1280;
-  if (w < 768) return POOL_MOBILE;
-  if (w < 1280) return POOL_TABLET;
-  return POOL_DESKTOP;
+  // Pool size always equals the number of lanes — one card per lane on every device
+  return COMPASS_ANGLES.length;
 }
 
 function pickIncrement(): number {
@@ -85,6 +84,7 @@ function pickIncrement(): number {
 type Card = {
   el: HTMLDivElement;
   img: HTMLImageElement;
+  laneIndex: number; // permanent lane assignment — never changes
   x0: number;
   y0: number;
   x: number;
@@ -145,7 +145,9 @@ export function Impressions() {
     START_COUNT.toLocaleString('en-US').split('')
   );
 
-  // ── Spawn card ──────────────────────────────────────────────────────────────
+  // ── Spawn card (lane-locked) ────────────────────────────────────────────────
+  // Direction is NEVER chosen here — it is fixed by card.laneIndex.
+  // Only radius, z, speed, tilt, drift, and image are regenerated on respawn.
   const spawnCard = (card: Card, spreadZ = false) => {
     const w = fieldW.current;
     const h = fieldH.current;
@@ -153,10 +155,9 @@ export function Impressions() {
     const minR = Math.min(w, h) * 0.26;
     const maxR = Math.min(w, h) * 0.52;
 
-    // Random compass direction with small angular jitter (±15°)
-    const dirIdx = Math.floor(Math.random() * COMPASS_ANGLES.length);
-    const baseAngle = COMPASS_ANGLES[dirIdx];
-    const jitter = (Math.random() - 0.5) * (Math.PI / 6);
+    // Fixed lane angle with very small jitter (±7°) — never enough to cross lanes
+    const baseAngle = COMPASS_ANGLES[card.laneIndex];
+    const jitter = (Math.random() - 0.5) * (7 * Math.PI / 180);
     const angle = baseAngle + jitter;
 
     const t = 0.45 + Math.random() * 0.55;
@@ -174,7 +175,7 @@ export function Impressions() {
     card.driftPhase = Math.random() * Math.PI * 2;
     card.tilt = (Math.random() - 0.5) * 16;
 
-    // Avoid same image twice consecutively
+    // Avoid same image twice consecutively in this lane
     let imgIdx: number;
     do { imgIdx = Math.floor(Math.random() * CARD_IMAGES.length); }
     while (imgIdx === card.lastImgIdx && CARD_IMAGES.length > 1);
@@ -199,6 +200,7 @@ export function Impressions() {
     const n = poolSize();
     const pool: Card[] = [];
 
+    // One card per lane — lane i owns card i permanently
     for (let i = 0; i < n; i++) {
       const el = document.createElement('div');
       el.style.cssText = [
@@ -224,6 +226,7 @@ export function Impressions() {
 
       pool.push({
         el, img,
+        laneIndex: i, // permanent lane assignment — never changes
         x0: 0, y0: 0, x: 0, y: 0,
         z: 0, vz: 0,
         driftAmp: 0, driftPhase: 0,
