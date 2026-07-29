@@ -31,7 +31,7 @@ const FALLBACK_IMG =
 // ─── Constants ───────────────────────────────────────────────────────────────
 const START_COUNT = 779_711_289;
 
-const Z_FAR = 0.0;
+const Z_FAR = 0.1;
 const Z_NEAR = 1.0;
 
 const VZ_MIN = 0.00115;
