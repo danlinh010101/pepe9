@@ -16,7 +16,7 @@ export function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" ref={ref} className={`section-full relative py-12 px-6 overflow-hidden section-reveal ${visible ? 'is-visible' : ''}`}>
+    <section id="faq" ref={ref} className={`section-full relative py-11 px-6 overflow-hidden section-reveal ${visible ? 'is-visible' : ''}`}>
       <div className="absolute top-1/3 right-0 w-80 h-80 bg-green-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative max-w-3xl mx-auto">
