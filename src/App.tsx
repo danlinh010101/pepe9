@@ -1,5 +1,5 @@
 import { CursorGlow } from '@/components/CursorGlow';
-import { HeroCurtain } from '@/components/HeroCurtain';
+import { HeroRevealTransition } from '@/components/HeroRevealTransition';
 import { Impressions } from '@/components/Impressions';
 import { GlobalFollowers } from '@/components/GlobalFollowers';
 import { Tokenomics } from '@/components/Tokenomics';
@@ -14,7 +14,7 @@ function App() {
   return (
     <div className="bg-black min-h-screen">
       <CursorGlow />
-      <HeroCurtain />
+      <HeroRevealTransition />
       <Impressions />
       <GlobalFollowers />
       <Tokenomics />
