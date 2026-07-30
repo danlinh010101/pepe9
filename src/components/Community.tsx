@@ -16,7 +16,7 @@ export function Community() {
   const tilt = useTilt<HTMLDivElement>(16);
 
   return (
-    <section id="community" ref={ref} className={`section-full relative py-20 px-6 overflow-hidden noise section-reveal ${visible ? 'is-visible' : ''}`} style={{ backgroundImage: "linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.72) 50%, rgba(0,0,0,0.88) 100%), url('https://ik.imagekit.io/zznoau6lx/ee5bb410-87fb-426d-acaa-f7fc13ed80b7.png?updatedAt=1784950374011')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <section id="community" ref={ref} className={`section-full relative py-12 px-6 overflow-hidden noise section-reveal ${visible ? 'is-visible' : ''}`} style={{ backgroundImage: "linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.72) 50%, rgba(0,0,0,0.88) 100%), url('https://ik.imagekit.io/zznoau6lx/ee5bb410-87fb-426d-acaa-f7fc13ed80b7.png?updatedAt=1784950374011')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[160px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-green-600/8 rounded-full blur-[120px] pointer-events-none" />
 
