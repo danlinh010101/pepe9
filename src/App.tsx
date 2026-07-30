@@ -1,6 +1,5 @@
   import { CursorGlow } from '@/components/CursorGlow';
   import { HeroRevealTransition } from '@/components/HeroRevealTransition';
-  import { Impressions } from '@/components/Impressions';
   import { GlobalFollowers } from '@/components/GlobalFollowers';
   import { Tokenomics } from '@/components/Tokenomics';
   import { HowToBuy } from '@/components/HowToBuy';
@@ -15,7 +14,6 @@
       <div className="bg-black min-h-screen">
         <CursorGlow />
         <HeroRevealTransition />
-        <Impressions />
         <GlobalFollowers />
         <Tokenomics />
         <HowToBuy />

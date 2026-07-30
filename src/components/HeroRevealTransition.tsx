@@ -1,34 +1,24 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { HeroScene } from '@/components/HeroScene';
+import { Impressions } from '@/components/Impressions';
 
 /**
- * Scroll distance reserved for the curtain reveal (vh).
- * The Hero stays pinned for this many viewport heights before releasing.
- */
-const REVEAL_VH = 100;
-
-/**
- * HeroRevealTransition — premium curtain reveal between Hero and Impressions.
+ * HeroRevealTransition — rigid-panel curtain lift.
  *
  * Architecture:
  *
- *   Pin container  (100vh + REVEAL_VH)      ← reserves scroll space
- *    └── Sticky  (position: sticky, 100vh)  ← browser-managed pinning
- *         └── motion.div  (clip-path)       ← the ONLY animated element
- *              └── HeroScene               ← untouched, fully alive
+ *   TransitionContainer (200vh)        ← reserves scroll space
+ *    └── StickyViewport (sticky, 100vh) ← browser-managed pinning
+ *         ├── HeroLayer (motion.div)    ← translateY: 0 → -100vh
+ *         │    └── HeroScene           ← untouched, fully alive
+ *         └── ImpressionsLayer         ← static, sits beneath the Hero
+ *              └── Impressions
  *
- * The pin container is taller than the viewport by REVEAL_VH.  CSS
- * `position: sticky` pins the Hero at the top for that extra distance.
- * A negative bottom-margin pulls the next section (Impressions) up so it
- * sits behind the pinned Hero in normal document flow.  As the user
- * scrolls, a single `clip-path: inset(0 0 X% 0)` on the motion.div
- * clips the Hero from the bottom upward, revealing Impressions beneath
- * — like lifting a heavy curtain.
- *
- * No transforms on the sticky.  No individual layer animation.
- * No requestAnimationFrame loop.  No React state updates on scroll.
- * Framer Motion MotionValues drive the clip directly from scroll progress.
+ * The viewport is sticky for 100vh of scroll.  The Hero translates upward
+ * as one rigid object from 0 to -100vh, physically vacating the viewport
+ * and exposing Impressions underneath.  No clipping, no masking, no layout
+ * hacks — just one translateY on one wrapper, driven by a MotionValue.
  */
 export function HeroRevealTransition() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -38,39 +28,46 @@ export function HeroRevealTransition() {
     offset: ['start start', 'end end'],
   });
 
-  // 0 → 100 : clips the Hero from the bottom upward.
-  const clipPercent = useTransform(scrollYProgress, [0, 1], [0, 100]);
-  const clipPath = useTransform(
-    clipPercent,
-    (v) => `inset(0 0 ${v.toFixed(2)}% 0)`,
-  );
+  // Linear 0 → -100vh.  No easing — Lenis provides smoothing.
+  const y = useTransform(scrollYProgress, [0, 1], ['0vh', '-100vh']);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        height: `calc(100vh + ${REVEAL_VH}vh)`,
-        marginBottom: '-100vh',
-      }}
-    >
+    <div ref={containerRef} style={{ height: '200vh' }}>
       <div
         style={{
           position: 'sticky',
           top: 0,
           height: '100vh',
           overflow: 'hidden',
-          zIndex: 30,
         }}
       >
+        {/* HeroLayer — the only animated element. Rigid panel. */}
         <motion.div
           style={{
             height: '100vh',
-            clipPath,
-            willChange: 'clip-path',
+            y,
+            willChange: 'transform',
+            zIndex: 20,
+            position: 'relative',
           }}
         >
           <HeroScene />
         </motion.div>
+
+        {/* ImpressionsLayer — static, revealed as the Hero lifts away. */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '100vh',
+            overflow: 'hidden',
+            zIndex: 10,
+          }}
+        >
+          <Impressions />
+        </div>
       </div>
     </div>
   );
