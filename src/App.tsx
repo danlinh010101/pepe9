@@ -2,8 +2,8 @@
   import { HeroRevealTransition } from '@/components/HeroRevealTransition';
   import { GlobalFollowers } from '@/components/GlobalFollowers';
   import { Tokenomics } from '@/components/Tokenomics';
-  import { HowToBuy } from '@/components/HowToBuy';
   import { Community, Footer } from '@/components/Community';
+  import { HowToBuyCommunityTransition } from '@/components/HowToBuyCommunityTransition';
   import { FAQ } from '@/components/FAQ';
   import { useLenis } from '@/hooks/useLenis';
   
@@ -16,8 +16,7 @@
         <HeroRevealTransition />
         <GlobalFollowers />
         <Tokenomics />
-        <HowToBuy />
-        <Community />
+        <HowToBuyCommunityTransition />
         <FAQ />
         <Footer />
       </div>
