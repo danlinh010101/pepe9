@@ -62,7 +62,7 @@ export function Tokenomics() {
   let offsetAcc = 0;
 
   return (
-    <section id="tokenomics" ref={ref} className={`section-full relative py-12 px-6 overflow-hidden section-reveal ${visible ? 'is-visible' : ''}`}>
+    <section id="tokenomics" ref={ref} className={`section-full relative py-13 px-6 overflow-hidden section-reveal ${visible ? 'is-visible' : ''}`}>
       {/* Background image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
