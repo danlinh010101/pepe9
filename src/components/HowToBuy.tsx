@@ -19,7 +19,7 @@ export function HowToBuy() {
     <section
       id="how-to-buy"
       ref={ref}
-      className={`section-full relative py-32 px-6 overflow-hidden mesh-bg noise section-reveal ${visible ? 'is-visible' : ''}`}
+      className={`section-full relative py-12 px-6 overflow-hidden mesh-bg noise section-reveal ${visible ? 'is-visible' : ''}`}
     >
       <div className="absolute -top-10 right-1/4 w-80 h-80 bg-green-500/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-green-600/8 rounded-full blur-[140px] pointer-events-none" />
