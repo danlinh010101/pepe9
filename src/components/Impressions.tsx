@@ -451,6 +451,7 @@ export function Impressions() {
 
   return (
     <section
+      id="stats"
       ref={ref}
       className={`relative min-h-screen overflow-hidden flex items-center justify-center px-6 py-32 imp-section section-reveal ${visible ? 'is-visible' : ''}`}
     >

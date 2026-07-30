@@ -269,24 +269,7 @@ export function HeroScene() {
       />
 
       <div ref={contentRef} className="relative z-20 flex flex-col h-screen will-change-transform">
-        <nav className="relative z-20 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-black tracking-tight text-green-400" style={{ fontFamily: '"JetBrains Mono", monospace' }}>$PEPE</span>
-          </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300" style={{ fontFamily: '"Space Grotesk", sans-serif' }}>
-            <a href="#community" className="hover:text-green-400 transition-colors">Community</a>
-            <a href="#tokenomics" className="hover:text-green-400 transition-colors">Tokenomics</a>
-            <a href="#how-to-buy" className="hover:text-green-400 transition-colors">How to Buy</a>
-            <a href="#faq" className="hover:text-green-400 transition-colors">FAQ</a>
-          </div>
-          <a
-            href="#how-to-buy"
-            className="inline-flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-bold text-black bg-green-400 hover:bg-green-300 transition-all duration-200 hover:scale-105"
-            style={{ fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700 }}
-          >
-            Buy $PEPE
-          </a>
-        </nav>
+        <div className="relative z-20 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full" />
 
         <div className="relative z-20 flex-1 flex flex-col items-center justify-center text-center px-6 pb-24 pt-4 sm:pt-8">
           <div className="inline-flex items-center gap-2 mb-10 px-4 py-1.5 rounded-full border border-green-500/40 bg-green-500/10 backdrop-blur-sm">

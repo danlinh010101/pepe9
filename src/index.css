@@ -82,6 +82,13 @@
     transform: translateY(0) scale(1);
   }
 
+  /* Force the Community section fully visible inside the HowToBuy→Community
+     premium transition — only translateY drives the reveal, never opacity. */
+  .htb-community-layer > section {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }

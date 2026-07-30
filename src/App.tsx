@@ -1,4 +1,5 @@
   import { CursorGlow } from '@/components/CursorGlow';
+  import { Navbar } from '@/components/Navbar';
   import { HeroRevealTransition } from '@/components/HeroRevealTransition';
   import { GlobalFollowers } from '@/components/GlobalFollowers';
   import { Tokenomics } from '@/components/Tokenomics';
@@ -13,6 +14,7 @@
     return (
       <div className="bg-black min-h-screen">
         <CursorGlow />
+        <Navbar />
         <HeroRevealTransition />
         <GlobalFollowers />
         <Tokenomics />

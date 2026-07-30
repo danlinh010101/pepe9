@@ -58,7 +58,9 @@ export function HowToBuyCommunityTransition() {
           <HowToBuy />
         </div>
 
-        {/* CommunityLayer — the only animated element. Rigid panel rising. */}
+        {/* CommunityLayer — the only animated element. Rigid panel rising.
+            opacity forced to 1 so the section-reveal fade never engages;
+            only translateY drives the reveal, matching HeroRevealTransition. */}
         <motion.div
           style={{
             position: 'absolute',
@@ -68,11 +70,14 @@ export function HowToBuyCommunityTransition() {
             height: '100vh',
             overflow: 'hidden',
             y,
+            opacity: 1,
             willChange: 'transform',
             zIndex: 20,
           }}
         >
-          <Community />
+          <div className="htb-community-layer" style={{ opacity: 1, transform: 'none' }}>
+            <Community />
+          </div>
         </motion.div>
       </div>
     </div>

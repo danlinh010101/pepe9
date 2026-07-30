@@ -1,7 +1,11 @@
-import { useState, useRef, type ReactNode } from 'react';
+import { useState, useRef, type ReactNode, type CSSProperties } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { Wallet, Coins, ArrowLeftRight, PartyPopper, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useReveal } from '@/hooks/useReveal';
 import Stepper, { Step, type StepperRef } from '@/components/Stepper';
+import { BlockchainPacketField } from '@/components/BlockchainPacketField';
+
+const STEP_IMAGE = 'https://ik.imagekit.io/zznoau6lx/plain-white-background-hd-clean-professional_Y4PE.webp';
 
 const STEPS = [
   { icon: Wallet,         title: 'Get a Wallet',    body: 'Download MetaMask or your favorite self-custody wallet. Fund it with ETH on the Ethereum network.' },
@@ -57,18 +61,51 @@ export function HowToBuy() {
           </p>
         </div>
 
-        {/* Premium glass stepper card */}
+        {/* Premium glass stepper card + environmental illustration + particles */}
         <div className={`max-w-2xl mx-auto reveal ${visible ? 'is-visible' : ''}`}>
-          <div
-            className="relative rounded-3xl overflow-hidden"
-            style={{
-              background: 'linear-gradient(145deg, rgba(74,222,128,0.06) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.75) 100%)',
-              border: '1px solid rgba(74,222,128,0.18)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
-            }}
-          >
+          <div className="relative">
+            {/* Background illustration — centered behind the card, animated on step change */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-visible" style={{ zIndex: 1 }}>
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={currentStep}
+                  src={STEP_IMAGE}
+                  alt=""
+                  aria-hidden="true"
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 0.14, y: 0 }}
+                  exit={{ opacity: 0, y: -24 }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="select-none"
+                  style={{
+                    width: 'min(800px, 120vw)',
+                    height: 'auto',
+                    filter: 'blur(2px) brightness(0) invert(1)',
+                    mixBlendMode: 'screen',
+                    boxShadow: '0 0 120px 40px rgba(74,222,128,0.18)',
+                    borderRadius: '9999px',
+                  }}
+                />
+              </AnimatePresence>
+            </div>
+
+            {/* Blockchain packets — occupy the space around/behind the card */}
+            <BlockchainPacketField
+              className="pointer-events-none absolute -inset-x-32 -inset-y-24"
+              style={{ zIndex: 2 } as CSSProperties}
+            />
+
+            <div
+              className="relative rounded-3xl overflow-hidden"
+              style={{
+                background: 'linear-gradient(145deg, rgba(74,222,128,0.06) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.75) 100%)',
+                border: '1px solid rgba(74,222,128,0.18)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                boxShadow: '0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
+                zIndex: 10,
+              }}
+            >
             {/* Glass reflection sweep */}
             <div
               className="pointer-events-none absolute inset-0 opacity-60"
@@ -116,6 +153,7 @@ export function HowToBuy() {
                 </Step>
               ))}
             </Stepper>
+          </div>
           </div>
         </div>
 
