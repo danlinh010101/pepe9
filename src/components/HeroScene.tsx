@@ -174,6 +174,7 @@ export function HeroScene() {
 
   return (
     <section
+      id="hero"
       ref={sectionRef}
       className="h-screen overflow-hidden flex flex-col relative"
     >
